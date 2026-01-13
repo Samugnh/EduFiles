@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFiles — Eliminar Registro</title>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body class="modal modal-eliminar">
+    <div class="container">
+        <h2>🗑️ Eliminar Registro</h2>
+
+        <div class="buscar-section">
+            <label for="buscarNombre">Buscar estudiante por nombre:</label>
+            <input type="text" id="buscarNombre" placeholder="Escribe el nombre...">
+            <button class="btn-buscar" onclick="buscarEstudiante()">Buscar</button>
+        </div>
+
+        <div id="infoEstudiante" class="info-estudiante">
+            <div class="info-item"><strong>Nombre:</strong> <span id="nombreInfo"></span></div>
+            <div class="info-item"><strong>Edad:</strong> <span id="edadInfo"></span></div>
+            <div class="info-item"><strong>Curso:</strong> <span id="cursoInfo"></span></div>
+            <div class="info-item"><strong>Email:</strong> <span id="emailInfo"></span></div>
+        </div>
+
+        <div class="warning">
+            ⚠️ Esta acción no se puede deshacer
+        </div>
+
+        <div class="botones">
+            <button type="button" class="btn-cancelar" onclick="cerrar()">Cancelar</button>
+            <button type="button" class="btn-eliminar" id="btnEliminar" onclick="eliminarRegistro()" disabled>Eliminar</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const store = require('./studentStore');
+        let estudianteSeleccionado = null;
+
+        function buscarEstudiante() {
+            const query = document.getElementById('buscarNombre').value;
+
+            const matches = store.findStudentsByQuery(query);
+            if (matches.length === 1) {
+                const encontrado = matches[0];
+                estudianteSeleccionado = encontrado;
+                document.getElementById('nombreInfo').textContent = `${encontrado.nombres || ''} ${encontrado.apellidos || ''}`.trim();
+                document.getElementById('edadInfo').textContent = encontrado.edad;
+                document.getElementById('cursoInfo').textContent = encontrado.curso;
+                document.getElementById('emailInfo').textContent = encontrado.email;
+                document.getElementById('infoEstudiante').classList.add('visible');
+                document.getElementById('btnEliminar').disabled = false;
+            } else if (matches.length === 0) {
+                alert('Estudiante no encontrado');
+                estudianteSeleccionado = null;
+                document.getElementById('infoEstudiante').classList.remove('visible');
+                document.getElementById('btnEliminar').disabled = true;
+            } else {
+                alert(`Se encontraron ${matches.length} estudiantes. Especifica mejor el nombre/apellido.`);
+                estudianteSeleccionado = null;
+                document.getElementById('infoEstudiante').classList.remove('visible');
+                document.getElementById('btnEliminar').disabled = true;
+            }
+        }
+
+        function eliminarRegistro() {
+            if (!estudianteSeleccionado) return;
+
+            const fullName = `${estudianteSeleccionado.nombres || ''} ${estudianteSeleccionado.apellidos || ''}`.trim();
+            if (confirm(`¿Estás seguro de eliminar a ${fullName}?`)) {
+                store.deleteStudent(estudianteSeleccionado.id);
+
+                ipcRenderer.send('eliminar-registro', estudianteSeleccionado.id);
+                cerrar();
+            }
+        }
+
+        function cerrar() {
+            ipcRenderer.send('cerrar-modal');
+        }
+    </script>
+</body>
+</html>

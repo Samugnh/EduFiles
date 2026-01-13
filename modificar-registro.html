@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFiles — Modificar Registro</title>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body class="modal modal-modificar">
+    <div class="container">
+        <h2>✏️ Modificar Registro</h2>
+
+        <div class="buscar-section">
+            <label for="buscarNombre">Buscar estudiante por nombre o apellido:</label>
+            <input type="text" id="buscarNombre" placeholder="Escribe nombre y/o apellido...">
+            <button class="btn-buscar" onclick="buscarEstudiante()">Buscar</button>
+        </div>
+
+        <form id="formModificar">
+            <input type="hidden" id="registroId">
+            
+            <div class="form-group">
+                <label for="nombre">Nombre del Estudiante:</label>
+                <input type="text" id="nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label for="apellidos">Apellidos del Estudiante:</label>
+                <input type="text" id="apellidos" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edad">Edad:</label>
+                <input type="number" id="edad" min="5" max="18" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cedulaEstudiante">Cédula del Estudiante:</label>
+                <input type="text" id="cedulaEstudiante" required>
+            </div>
+
+            <div class="form-group">
+                <label for="fechaNacimiento">Fecha de Nacimiento del Estudiante:</label>
+                <input type="date" id="fechaNacimiento" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sexo">Sexo del Estudiante:</label>
+                <select id="sexo" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="jornada">Jornada:</label>
+                <select id="jornada" required>
+                    <option value="">Seleccione una jornada</option>
+                    <option value="Matutina">Matutina</option>
+                    <option value="Vespertina">Vespertina</option>
+                    <option value="Nocturna">Nocturna</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="anioLectivo">Año Lectivo:</label>
+                <input type="text" id="anioLectivo" placeholder="2025-2026" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono">
+            </div>
+
+            <div class="form-group">
+                <label for="foto">Foto (opcional):</label>
+                <input type="file" id="foto" accept="image/*">
+                <div class="foto-preview-wrap">
+                    <img id="fotoPreview" class="foto-preview" alt="Preview" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="curso">Curso:</label>
+                <select id="curso" required>
+                    <option value="">Seleccione un curso</option>
+                    <option value="1ro Bachillerato Tecnico">1ro Bachillerato Tecnico</option>
+                    <option value="2do Bachillerato Tecnico">2do Bachillerato Tecnico</option>
+                    <option value="3ro Bachillerato Tecnico">3ro Bachillerato Tecnico</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion">
+            </div>
+
+            <div class="form-group">
+                <label for="nombreRepresentante">Nombre del Representante:</label>
+                <input type="text" id="nombreRepresentante" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cedulaRepresentante">Cédula del Representante:</label>
+                <input type="text" id="cedulaRepresentante" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefonoRepresentante">Teléfono del Representante:</label>
+                <input type="text" id="telefonoRepresentante" required>
+            </div>
+
+            <div class="botones">
+                <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
+                <button type="submit" class="btn-modificar">Modificar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const store = require('./studentStore');
+
+        const DEFAULT_PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+                <rect width="128" height="128" rx="64" fill="#e5e7eb"/>
+                <circle cx="64" cy="50" r="22" fill="#9ca3af"/>
+                <path d="M26 116c7-22 25-34 38-34h0c13 0 31 12 38 34" fill="#9ca3af"/>
+            </svg>`
+        )}`;
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('No se pudo leer la imagen'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function getFotoDataUrl() {
+            const input = document.getElementById('foto');
+            const file = input && input.files ? input.files[0] : null;
+            if (!file) return '';
+
+            const maxBytes = 300 * 1024;
+            if (file.size > maxBytes) {
+                alert('La foto es muy grande. Usa una imagen más pequeña (<= 300KB).');
+                return '';
+            }
+
+            return await readFileAsDataUrl(file);
+        }
+
+        let estudianteActual = null;
+
+        const fotoPreview = document.getElementById('fotoPreview');
+        if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
+
+        const fotoInput = document.getElementById('foto');
+        if (fotoInput) {
+            fotoInput.addEventListener('change', async () => {
+                try {
+                    const dataUrl = await getFotoDataUrl();
+                    if (fotoPreview) fotoPreview.src = dataUrl || (estudianteActual && estudianteActual.foto) || DEFAULT_PHOTO;
+                } catch {
+                    if (fotoPreview) fotoPreview.src = (estudianteActual && estudianteActual.foto) || DEFAULT_PHOTO;
+                }
+            });
+        }
+
+        function setFormEnabled(enabled) {
+            const ids = ['nombre', 'apellidos', 'edad', 'cedulaEstudiante', 'fechaNacimiento', 'sexo', 'jornada', 'anioLectivo', 'email', 'telefono', 'curso', 'direccion', 'nombreRepresentante', 'cedulaRepresentante', 'telefonoRepresentante'];
+            for (const id of ids) {
+                const el = document.getElementById(id);
+                if (el) el.disabled = !enabled;
+            }
+        }
+
+        setFormEnabled(false);
+
+        function buscarEstudiante() {
+            const query = document.getElementById('buscarNombre').value;
+
+            const matches = store.findStudentsByQuery(query);
+            if (matches.length === 1) {
+                const encontrado = matches[0];
+                estudianteActual = encontrado;
+                document.getElementById('registroId').value = encontrado.id;
+                document.getElementById('nombre').value = encontrado.nombres || '';
+                document.getElementById('apellidos').value = encontrado.apellidos || '';
+                document.getElementById('edad').value = encontrado.edad ?? '';
+                document.getElementById('cedulaEstudiante').value = encontrado.cedulaEstudiante || '';
+                document.getElementById('fechaNacimiento').value = encontrado.fechaNacimiento || '';
+                document.getElementById('sexo').value = encontrado.sexo || '';
+                document.getElementById('jornada').value = encontrado.jornada || '';
+                document.getElementById('anioLectivo').value = encontrado.anioLectivo || '';
+                document.getElementById('email').value = encontrado.email || '';
+                document.getElementById('telefono').value = encontrado.telefono || '';
+                document.getElementById('curso').value = encontrado.curso || '';
+                document.getElementById('direccion').value = encontrado.direccion || '';
+                document.getElementById('nombreRepresentante').value = encontrado.nombreRepresentante || '';
+                document.getElementById('cedulaRepresentante').value = encontrado.cedulaRepresentante || '';
+                document.getElementById('telefonoRepresentante').value = encontrado.telefonoRepresentante || '';
+                if (fotoPreview) fotoPreview.src = encontrado.foto || DEFAULT_PHOTO;
+                setFormEnabled(true);
+            } else if (matches.length === 0) {
+                alert('Estudiante no encontrado');
+                estudianteActual = null;
+                document.getElementById('registroId').value = '';
+                if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
+                setFormEnabled(false);
+            } else {
+                alert(`Se encontraron ${matches.length} estudiantes. Especifica mejor el nombre/apellido.`);
+                estudianteActual = null;
+                document.getElementById('registroId').value = '';
+                if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
+                setFormEnabled(false);
+            }
+        }
+
+        document.getElementById('formModificar').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const idRaw = document.getElementById('registroId').value;
+            const id = parseInt(idRaw);
+            if (!idRaw || Number.isNaN(id)) {
+                alert('Primero busca y selecciona un estudiante.');
+                return;
+            }
+            const datos = {
+                id: id,
+                nombres: document.getElementById('nombre').value,
+                apellidos: document.getElementById('apellidos').value,
+                edad: Number(document.getElementById('edad').value),
+                cedulaEstudiante: document.getElementById('cedulaEstudiante').value,
+                fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                sexo: document.getElementById('sexo').value,
+                jornada: document.getElementById('jornada').value,
+                anioLectivo: document.getElementById('anioLectivo').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                curso: document.getElementById('curso').value,
+                direccion: document.getElementById('direccion').value,
+                nombreRepresentante: document.getElementById('nombreRepresentante').value,
+                cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
+                telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
+                foto: (estudianteActual && estudianteActual.foto) || ''
+            };
+
+            const nuevaFoto = await getFotoDataUrl();
+            if (nuevaFoto) {
+                datos.foto = nuevaFoto;
+            }
+
+            const updated = store.updateStudent(datos);
+            if (!updated) {
+                alert('No se pudo modificar: estudiante no existe (o fue eliminado).');
+                return;
+            }
+
+            ipcRenderer.send('modificar-registro', datos);
+        });
+
+        document.getElementById('btnCancelar').addEventListener('click', () => {
+            ipcRenderer.send('cerrar-modal');
+        });
+    </script>
+</body>
+</html>

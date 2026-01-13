@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>EduFiles</title>
+        <link href="styles.css" rel="stylesheet" type="text/css">
+        <script src="https://kit.fontawesome.com/38e0cd1ced.js" crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+        <nav class="contenedor-nav">
+            <ul class="nav-list">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="Registros.html">Registros</a></li>
+            <li><a href="Buscar.html">Buscar</a></li>
+            <li><a href="Desarrolladores.html">Desarrolladores</a></li>
+            </ul>
+        </nav>
+
+        <div class="contenedor-buscar">
+            <form id="searchForm">
+                <input id="searchInput" type="text" placeholder="Ingrese el nombre o apellido del estudiante...">
+                <button aria-label="Buscar" type="submit"><i class="fa-brands fa-searchengin"></i></button>
+            </form>
+        </div>
+        <div id="resultados" class="contenedor-estudiantes"></div>
+    </body>
+
+    <script src="buscar.js"></script>
+</html>

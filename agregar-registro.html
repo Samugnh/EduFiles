@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFiles — Agregar Registro</title>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body class="modal modal-agregar">
+    <div class="container">
+        <h2>📝 Agregar Nuevo Registro</h2>
+
+        <form id="formRegistro">
+            <div class="form-group">
+                <label for="nombre">Nombre del Estudiante:</label>
+                <input type="text" id="nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label for="apellidos">Apellidos del Estudiante:</label>
+                <input type="text" id="apellidos" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edad">Edad:</label>
+                <input type="number" id="edad" min="5" max="18" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cedulaEstudiante">Cédula del Estudiante:</label>
+                <input type="text" id="cedulaEstudiante" required>
+            </div>
+
+            <div class="form-group">
+                <label for="fechaNacimiento">Fecha de Nacimiento del Estudiante:</label>
+                <input type="date" id="fechaNacimiento" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sexo">Sexo del Estudiante:</label>
+                <select id="sexo" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="jornada">Jornada:</label>
+                <select id="jornada" required>
+                    <option value="">Seleccione una jornada</option>
+                    <option value="Matutina">Matutina</option>
+                    <option value="Vespertina">Vespertina</option>
+                    <option value="Nocturna">Nocturna</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="anioLectivo">Año Lectivo:</label>
+                <input type="text" id="anioLectivo" placeholder="2025-2026" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono">
+            </div>
+
+            <div class="form-group">
+                <label for="foto">Foto (opcional):</label>
+                <input type="file" id="foto" accept="image/*">
+                <div class="foto-preview-wrap">
+                    <img id="fotoPreview" class="foto-preview" alt="Preview" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="curso">Curso:</label>
+                <select id="curso" required>
+                    <option value="">Seleccione un curso</option>
+                    <option value="1ro Bachillerato Tecnico">1ro Bachillerato Tecnico</option>
+                    <option value="2do Bachillerato Tecnico">2do Bachillerato Tecnico</option>
+                    <option value="3ro Bachillerato Tecnico">3ro Bachillerato Tecnico</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion">
+            </div>
+
+            <div class="form-group">
+                <label for="nombreRepresentante">Nombre del Representante:</label>
+                <input type="text" id="nombreRepresentante" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cedulaRepresentante">Cédula del Representante:</label>
+                <input type="text" id="cedulaRepresentante" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefonoRepresentante">Teléfono del Representante:</label>
+                <input type="text" id="telefonoRepresentante" required>
+            </div>
+
+            <div class="botones">
+                <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
+                <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const store = require('./studentStore');
+
+        const DEFAULT_PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+                <rect width="128" height="128" rx="64" fill="#e5e7eb"/>
+                <circle cx="64" cy="50" r="22" fill="#9ca3af"/>
+                <path d="M26 116c7-22 25-34 38-34h0c13 0 31 12 38 34" fill="#9ca3af"/>
+            </svg>`
+        )}`;
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('No se pudo leer la imagen'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function getFotoDataUrl() {
+            const input = document.getElementById('foto');
+            const file = input && input.files ? input.files[0] : null;
+            if (!file) return '';
+
+            // Evitar reventar el localStorage con fotos enormes.
+            const maxBytes = 300 * 1024;
+            if (file.size > maxBytes) {
+                alert('La foto es muy grande. Usa una imagen más pequeña (<= 300KB).');
+                return '';
+            }
+
+            return await readFileAsDataUrl(file);
+        }
+
+        const fotoPreview = document.getElementById('fotoPreview');
+        if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
+
+        const fotoInput = document.getElementById('foto');
+        if (fotoInput) {
+            fotoInput.addEventListener('change', async () => {
+                try {
+                    const dataUrl = await getFotoDataUrl();
+                    if (fotoPreview) fotoPreview.src = dataUrl || DEFAULT_PHOTO;
+                } catch {
+                    if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
+                }
+            });
+        }
+
+        document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const foto = await getFotoDataUrl();
+
+            const datos = {
+                id: Date.now(),
+                nombres: document.getElementById('nombre').value,
+                apellidos: document.getElementById('apellidos').value,
+                edad: Number(document.getElementById('edad').value),
+                cedulaEstudiante: document.getElementById('cedulaEstudiante').value,
+                fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                sexo: document.getElementById('sexo').value,
+                jornada: document.getElementById('jornada').value,
+                anioLectivo: document.getElementById('anioLectivo').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                curso: document.getElementById('curso').value,
+                direccion: document.getElementById('direccion').value,
+                nombreRepresentante: document.getElementById('nombreRepresentante').value,
+                cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
+                telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
+                foto: foto
+            };
+
+            store.addStudent(datos);
+
+            ipcRenderer.send('guardar-registro', datos);
+        });
+
+        document.getElementById('btnCancelar').addEventListener('click', () => {
+            ipcRenderer.send('cerrar-modal');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+/* ==============================
+   EduFiles — estilos globales
+   Paleta: blanco / celeste / celeste oscuro / grises
+   ============================== */
+
+:root {
+  --c-bg: #ffffff;
+  --c-surface: #f3f5f7; /* gris clarito para separar secciones */
+  --c-border: #d7dde3;
+
+  --c-primary: #2daae1; /* celeste institucional */
+  --c-primary-dark: #167ab3; /* celeste oscuro */
+
+  --c-text: #111827; /* gris oscuro/casi negro para texto */
+  --c-text-muted: #4b5563;
+
+  --radius: 16px;
+  --shadow-sm: 0 10px 25px rgba(17, 24, 39, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+  line-height: 1.45;
+}
+
+h1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px;
+  margin: 10px 0;
+  color: var(--c-primary-dark);
+  letter-spacing: 0.2px;
+}
+
+h2 {
+  color: var(--c-primary-dark);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==============================
+   Barra de navegación
+   ============================== */
+
+.contenedor-nav {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  padding: 14px 0;
+  background: var(--c-primary);
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+}
+
+.nav-list {
+  display: flex;
+  gap: 0.8rem;
+  list-style-type: none;
+}
+
+.contenedor-nav li a {
+  text-decoration: none;
+  color: #ffffff;
+  margin: 0 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  opacity: 0.92;
+  font-weight: 600;
+}
+
+.contenedor-nav li a:hover {
+  background-color: var(--c-primary-dark);
+  opacity: 1;
+}
+
+/* ==============================
+   Inicio (cards de estudiantes)
+   ============================== */
+
+.contenedor-carpetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  width: 90%;
+  margin: 26px auto 40px;
+}
+
+.cajon {
+  width: 220px;
+  min-height: 170px;
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  flex-direction: column;
+  padding: 14px;
+  text-align: center;
+}
+
+.student-name {
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--c-text);
+}
+
+.student-course {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  font-weight: 600;
+}
+
+.student-photo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid rgba(17, 24, 39, 0.1);
+  background: var(--c-surface);
+}
+
+/* ==============================
+   Desarrolladores
+   ============================== */
+
+.contenedor-dev {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  margin: 26px auto 40px;
+  width: fit-content;
+  max-width: 92%;
+}
+
+.dev {
+  width: 360px;
+  min-height: 380px;
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  flex: 0 0 auto;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.dev h2 {
+  padding: 10px;
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.dev-photo {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--c-surface);
+  border: 2px solid rgba(17, 24, 39, 0.1);
+  margin: 10px 0 12px;
+}
+
+.dev p {
+  padding: 10px;
+  flex: 0 0 auto;
+  color: var(--c-text-muted);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ==============================
+   Búsqueda
+   ============================== */
+
+.contenedor-buscar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.contenedor-buscar form {
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  width: 80%;
+  max-width: 700px;
+  height: 60px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding-left: 18px;
+  padding-right: 8px;
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06);
+}
+
+.contenedor-buscar form input {
+  font-size: 16px;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background-color: transparent;
+  color: var(--c-text);
+}
+
+.contenedor-buscar form button {
+  background-color: var(--c-primary);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contenedor-buscar form button:hover {
+  background-color: var(--c-primary-dark);
+}
+
+button i {
+  font-size: 22px;
+}
+
+.contenedor-estudiantes {
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  width: 70%;
+  margin: 26px auto 40px;
+  padding: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==============================
+   Registros
+   ============================== */
+
+.contenedor-registros {
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  width: 70%;
+  min-height: 260px;
+  margin: 26px auto 40px;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  padding: 18px;
+}
+
+.contenedor-registros .botones {
+  background-color: var(--c-primary);
+  color: #ffffff;
+  border: 0;
+  border-radius: 16px;
+  width: 220px;
+  height: 90px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 10px 20px rgba(17, 24, 39, 0.08);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.contenedor-registros .botones:hover {
+  background-color: var(--c-primary-dark);
+  transform: translateY(-2px);
+}
+
+/* ==============================
+   Modales (agregar/modificar/eliminar/ver)
+   — estilos compartidos
+   ============================== */
+
+.modal {
+  background: var(--c-surface);
+  padding: 24px;
+}
+
+.modal .container {
+  background: var(--c-bg);
+  padding: 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--c-border);
+  box-shadow: var(--shadow-sm);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.modal h2 {
+  margin-bottom: 18px;
+  color: var(--c-primary-dark);
+  text-align: center;
+}
+
+.modal .form-group {
+  margin-bottom: 16px;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--c-text);
+  background: #fff;
+}
+
+.modal input:focus,
+.modal select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(45, 170, 225, 0.18);
+}
+
+.modal input:disabled,
+.modal select:disabled {
+  opacity: 0.65;
+  background: var(--c-surface);
+}
+
+.modal .buscar-section {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--c-surface);
+  border-radius: 14px;
+  border: 1px solid var(--c-border);
+}
+
+.modal .buscar-section input {
+  margin-bottom: 10px;
+}
+
+.modal .botones {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.modal button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.modal .btn-guardar,
+.modal .btn-modificar,
+.modal .btn-buscar {
+  background: var(--c-primary);
+  color: #fff;
+}
+
+.modal .btn-buscar {
+  width: 100%;
+  flex: none;
+}
+
+.modal .btn-guardar:hover,
+.modal .btn-modificar:hover,
+.modal .btn-buscar:hover {
+  background: var(--c-primary-dark);
+  transform: translateY(-1px);
+}
+
+.modal .btn-cancelar,
+.modal .btn-cerrar {
+  background: #e5e7eb;
+  color: var(--c-text);
+}
+
+.modal .btn-cancelar:hover,
+.modal .btn-cerrar:hover {
+  background: #d1d5db;
+  transform: translateY(-1px);
+}
+
+/* Foto preview (agregar / modificar) */
+.foto-preview-wrap {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.foto-preview {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--c-border);
+  background: var(--c-surface);
+}
+
+/* Eliminar */
+.modal-eliminar .info-estudiante {
+  display: none;
+  padding: 16px;
+  background: rgba(45, 170, 225, 0.12);
+  border-radius: 14px;
+  border: 1px solid rgba(45, 170, 225, 0.25);
+  margin-bottom: 16px;
+}
+
+.modal-eliminar .info-estudiante.visible {
+  display: block;
+}
+
+.modal-eliminar .info-item {
+  margin-bottom: 10px;
+  color: var(--c-text);
+}
+
+.modal-eliminar .warning {
+  background: rgba(45, 170, 225, 0.12);
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+  color: var(--c-primary-dark);
+  font-weight: 800;
+  border: 1px solid rgba(45, 170, 225, 0.25);
+}
+
+.modal-eliminar .btn-eliminar {
+  background: var(--c-text);
+  color: #fff;
+}
+
+.modal-eliminar .btn-eliminar:hover {
+  background: #0b1220;
+  transform: translateY(-1px);
+}
+
+.modal-eliminar .btn-eliminar:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Ver detalle */
+.modal-ver .header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.modal-ver .foto {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(17, 24, 39, 0.08);
+  background: var(--c-surface);
+}
+
+.modal-ver .nombre {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--c-text);
+}
+
+.modal-ver .curso {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--c-text-muted);
+  font-weight: 700;
+}
+
+.modal-ver .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.modal-ver .item {
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--c-surface);
+}
+
+.modal-ver .label {
+  font-size: 12px;
+  color: var(--c-text-muted);
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.modal-ver .value {
+  font-size: 14px;
+  color: var(--c-text);
+}
+
+.modal-ver .error {
+  padding: 12px;
+  background: var(--c-text);
+  border-radius: 14px;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 14px;
+}

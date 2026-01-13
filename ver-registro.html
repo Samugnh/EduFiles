@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFiles — Detalle del Estudiante</title>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body class="modal modal-ver">
+    <div class="container">
+        <h2>👤 Detalle del Estudiante</h2>
+
+        <div id="error" class="error hidden"></div>
+
+        <div class="header">
+            <img id="foto" class="foto" alt="Foto del estudiante" />
+            <div>
+                <div id="nombre" class="nombre"></div>
+                <div id="curso" class="curso"></div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="item">
+                <div class="label">Edad</div>
+                <div id="edad" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Cédula del Estudiante</div>
+                <div id="cedulaEstudiante" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Fecha de Nacimiento</div>
+                <div id="fechaNacimiento" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Sexo</div>
+                <div id="sexo" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Jornada</div>
+                <div id="jornada" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Año Lectivo</div>
+                <div id="anioLectivo" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Email</div>
+                <div id="email" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Teléfono</div>
+                <div id="telefono" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Dirección</div>
+                <div id="direccion" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Nombre del Representante</div>
+                <div id="nombreRepresentante" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Cédula del Representante</div>
+                <div id="cedulaRepresentante" class="value"></div>
+            </div>
+            <div class="item">
+                <div class="label">Teléfono del Representante</div>
+                <div id="telefonoRepresentante" class="value"></div>
+            </div>
+        </div>
+
+        <div class="botones">
+            <button type="button" class="btn-cerrar" id="btnCerrar">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const store = require('./studentStore');
+
+        const DEFAULT_PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+                <rect width="128" height="128" rx="64" fill="#e5e7eb"/>
+                <circle cx="64" cy="50" r="22" fill="#9ca3af"/>
+                <path d="M26 116c7-22 25-34 38-34h0c13 0 31 12 38 34" fill="#9ca3af"/>
+            </svg>`
+        )}`;
+
+        function getIdFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const raw = params.get('id');
+            if (!raw) return null;
+            const id = parseInt(raw);
+            return Number.isNaN(id) ? null : id;
+        }
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value ?? '';
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error');
+            if (!el) return;
+            el.classList.remove('hidden');
+            el.textContent = msg;
+        }
+
+        function render() {
+            const id = getIdFromQuery();
+            if (!id) {
+                showError('No se recibió un ID válido del estudiante.');
+                return;
+            }
+
+            const students = store.loadStudents();
+            const s = students.find((x) => x?.id === id);
+            if (!s) {
+                showError('Estudiante no encontrado (puede que haya sido eliminado).');
+                return;
+            }
+
+            const fullName = store.getFullName(s) || '(Sin nombre)';
+            const foto = s.foto || DEFAULT_PHOTO;
+
+            const fotoEl = document.getElementById('foto');
+            if (fotoEl) fotoEl.src = foto;
+
+            setText('nombre', fullName);
+            setText('curso', s.curso || '');
+            setText('edad', s.edad ?? '');
+            setText('cedulaEstudiante', s.cedulaEstudiante || '');
+            setText('fechaNacimiento', s.fechaNacimiento || '');
+            setText('sexo', s.sexo || '');
+            setText('jornada', s.jornada || '');
+            setText('anioLectivo', s.anioLectivo || '');
+            setText('email', s.email || '');
+            setText('telefono', s.telefono || '');
+            setText('direccion', s.direccion || '');
+            setText('nombreRepresentante', s.nombreRepresentante || '');
+            setText('cedulaRepresentante', s.cedulaRepresentante || '');
+            setText('telefonoRepresentante', s.telefonoRepresentante || '');
+        }
+
+        document.getElementById('btnCerrar').addEventListener('click', () => {
+            ipcRenderer.send('cerrar-modal');
+        });
+
+        document.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "edufiles",
+  "version": "1.0.0",
+  "description": "Gestor de archivos institucionales",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.Samugnh.edufiles",
+    "win": {
+      "target": "portable",
+      "icon": "icon.ico"
+    }
+  }
+}
