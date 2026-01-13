@@ -8,20 +8,24 @@
     "dist": "electron-builder"
   },
   "build": {
-  "appId": "com.edufiles.v2",
-  "productName": "EduFiles",
-  "win": {
-    "target": [
-      "nsis"
-    ],
-    "icon": "icon.ico"
+    "appId": "com.edufiles.v2",
+    "productName": "EduFiles",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "EduFiles"
+    }
   },
-  "nsis": {
-    "oneClick": true,
-    "allowToChangeInstallationDirectory": false,
-    "createDesktopShortcut": true,
-    "createStartMenuShortcut": true,
-    "shortcutName": "EduFiles"
+  "devDependencies": {
+    "electron": "^39.2.7",
+    "electron-builder": "^26.4.0"
   }
-}
 }
