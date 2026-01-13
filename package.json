@@ -8,10 +8,20 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.Samugnh.edufiles",
-    "win": {
-      "target": "portable",
-      "icon": "icon.ico"
-    }
+  "appId": "com.edufiles.app",
+  "productName": "EduFiles",
+  "win": {
+    "target": [
+      "nsis"
+    ],
+    "icon": "icon.ico"
+  },
+  "nsis": {
+    "oneClick": true,
+    "allowToChangeInstallationDirectory": false,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "EduFiles"
   }
+}
 }
