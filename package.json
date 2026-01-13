@@ -8,7 +8,7 @@
     "dist": "electron-builder"
   },
   "build": {
-  "appId": "com.edufiles.app",
+  "appId": "com.edufiles.v2",
   "productName": "EduFiles",
   "win": {
     "target": [
