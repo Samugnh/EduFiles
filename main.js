@@ -25,7 +25,7 @@ function createWindow() {
 
 // --- FUNCIÓN PARA VERIFICAR ACTUALIZACIONES ---
 function verificarActualizacion() {
-    const url = 'https://api.github.com/repos/TU-USUARIO/TU-REPOSITORIO/releases/latest';
+    const url = 'https://api.github.com/repos/Samugnh/EduFiles/releases/latest';
     
     https.get(url, { headers: { 'User-Agent': 'mi-app' } }, (res) => {
         let data = '';
