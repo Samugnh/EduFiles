@@ -6,7 +6,7 @@
 
 Para probar la aplicación sin necesidad de instalar el código, puedes descargar el ejecutable directamente desde nuestra sección de lanzamientos:
 
-👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v1.0.0/edufiles.exe)**
+👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v1.0.0/EduFiles.Setup.1.0.0.exe)**
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -28,7 +28,7 @@ Si deseas clonar este proyecto y ejecutarlo en tu entorno local, sigue estos pas
 
 Para probar la aplicación sin necesidad de instalar el código, puedes descargar el ejecutable directamente desde nuestra sección de lanzamientos:
 
-👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v1.0.0/edufiles.exe)**
+👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v1.0.0/EduFiles.Setup.1.0.0.exe)**
 
 ## 🛠️ Tecnologías Utilizadas
 
