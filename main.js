@@ -161,6 +161,17 @@ ipcMain.on('eliminar-registro', async (event, id) => {
     }
 });
 
+// EVENTO PARA BUSCAR TODOS LOS ESTUDIANTES EN LA NUBE
+ipcMain.handle('obtener-estudiantes', async () => {
+    try {
+        // Trae todos los registros de la base de datos
+        return await Estudiante.find().lean(); 
+    } catch (err) {
+        console.error('Error al obtener datos:', err);
+        return [];
+    }
+});
+
 ipcMain.on('cerrar-modal', () => {
     if (ventanaModal) ventanaModal.close();
 });
