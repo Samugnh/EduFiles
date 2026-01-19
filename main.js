@@ -1,7 +1,26 @@
-// ESTO ES DE LA VENTANA PRINCIPAL
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const https = require('https');
 const path = require('path');
+const mongoose = require('mongoose'); // <--- Añadido para la base de datos
+
+// --- CONFIGURACIÓN DE MONGODB ---
+
+const mongoURI = 'mongodb+srv://samugnh2022v_db_user:l4glcrTCG8L0nk8@cluster0.abcde.mongodb.net/EduFiles?retryWrites=true&w=majority';
+
+mongoose.connect(mongoURI)
+    .then(() => console.log('Conectado a MongoDB Atlas'))
+    .catch(err => console.error('Error de conexión:', err));
+
+// Definimos el esquema del Estudiante para la nube
+const EstudianteSchema = new mongoose.Schema({
+    nombre: String,
+    apellido: String,
+    cedula: String,
+    curso: String,
+    fechaRegistro: { type: Date, default: Date.now }
+});
+
+const Estudiante = mongoose.model('Estudiante', EstudianteSchema);
 
 let mainWindow;
 let ventanaModal;
@@ -10,7 +29,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1920,
     height: 1080,
-    icon: path.join(__dirname, 'icon-small.ico'), // <--- Línea añadida para el icono
+    icon: path.join(__dirname, 'icon-small.ico'), 
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -23,10 +42,10 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
 // --- FUNCIÓN PARA VERIFICAR ACTUALIZACIONES ---
 function verificarActualizacion() {
     const url = 'https://api.github.com/repos/Samugnh/EduFiles/releases/latest';
-
     https.get(url, { headers: { 'User-Agent': 'mi-app' } }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
@@ -35,34 +54,23 @@ function verificarActualizacion() {
                 const release = JSON.parse(data);
                 const versionNueva = release.tag_name.replace('v', '');
                 const versionActual = app.getVersion();
-
                 if (versionNueva > versionActual) {
                     dialog.showMessageBox({
                         type: 'info',
                         title: 'Actualización disponible',
-                        message: `Hay una nueva versión disponible: ${versionNueva}\nTu versión actual: ${versionActual}`,
-                        buttons: ['Descargar ahora', 'Más tarde']
+                        message: `Hay una versión nueva: ${versionNueva}`,
+                        buttons: ['Descargar', 'Más tarde']
                     }).then(result => {
-                        if (result.response === 0) {
-                            shell.openExternal(release.html_url);
-                        }
+                        if (result.response === 0) shell.openExternal(release.html_url);
                     });
                 }
-            } catch (error) {
-                console.log('Error al verificar actualizaciones:', error);
-            }
+            } catch (e) { console.log(e); }
         });
-    }).on('error', (error) => {
-        console.log('Error de conexión:', error);
     });
 }
 
-// --- RESTO DEL CÓDIGO (FUNCIONES Y EVENTOS) ---
-
 function createModalWindow(tipo, payload) {
-    if (ventanaModal) {
-        ventanaModal.close();
-    }
+    if (ventanaModal) ventanaModal.close();
 
     ventanaModal = new BrowserWindow({
         width: tipo === 'detalle' ? 650 : 500,
@@ -71,68 +79,70 @@ function createModalWindow(tipo, payload) {
         modal: true,
         show: false,
         resizable: false,
-        icon: path.join(__dirname, 'icon-small.ico'), // <--- También aquí para las modales
+        icon: path.join(__dirname, 'icon-small.ico'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         }
     });
-    if (tipo === 'agregar') {
-        ventanaModal.loadFile('agregar-registro.html');
-    } else if (tipo === 'modificar') {
-        ventanaModal.loadFile('modificar-registro.html');
-    } else if (tipo === 'eliminar') {
-        ventanaModal.loadFile('eliminar-registro.html');
-    } else if (tipo === 'detalle') {
+
+    if (tipo === 'agregar') ventanaModal.loadFile('agregar-registro.html');
+    else if (tipo === 'modificar') ventanaModal.loadFile('modificar-registro.html');
+    else if (tipo === 'eliminar') ventanaModal.loadFile('eliminar-registro.html');
+    else if (tipo === 'detalle') {
         const id = payload && payload.id ? String(payload.id) : '';
         ventanaModal.loadFile('ver-registro.html', { query: { id: id } });
     }
 
-    // --- MOSTRAR LA VENTANA CUANDO ESTÉ LISTA ---
-    ventanaModal.once('ready-to-show', () => {
-        ventanaModal.show();
-    });
-
-    ventanaModal.on('closed', () => {
-        ventanaModal = null;
-    });
+    ventanaModal.once('ready-to-show', () => ventanaModal.show());
+    ventanaModal.on('closed', () => ventanaModal = null);
 }
-    // ... (El resto del código de la función se mantiene igual)
-   
+
 app.whenReady().then(() => {
     createWindow();
-    verificarActualizacion(); // ← NUEVA LÍNEA: Verifica actualizaciones al iniciar
+    verificarActualizacion();
 });
 
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
-});
-
-app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-    }
-});
+// --- EVENTOS IPC ACTUALIZADOS PARA LA NUBE ---
 
 ipcMain.on('abrir-modal', (event, tipo, payload) => {
     createModalWindow(tipo, payload);
 });
 
-ipcMain.on('guardar-registro', (event, datos) => {
-    if (mainWindow) mainWindow.webContents.send('registro-guardado', datos);
-    if (ventanaModal) ventanaModal.close();
+// 1. GUARDAR EN LA NUBE
+ipcMain.on('guardar-registro', async (event, datos) => {
+    try {
+        const nuevoEstudiante = new Estudiante(datos);
+        await nuevoEstudiante.save();
+        if (mainWindow) mainWindow.webContents.send('registro-guardado', datos);
+        if (ventanaModal) ventanaModal.close();
+    } catch (err) {
+        console.error('Error al guardar:', err);
+    }
 });
 
-ipcMain.on('modificar-registro', (event, datos) => {
-    if (mainWindow) mainWindow.webContents.send('registro-modificado', datos);
-    if (ventanaModal) ventanaModal.close();
+// 2. MODIFICAR EN LA NUBE
+ipcMain.on('modificar-registro', async (event, datos) => {
+    try {
+        await Estudiante.findByIdAndUpdate(datos.id, datos);
+        if (mainWindow) mainWindow.webContents.send('registro-modificado', datos);
+        if (ventanaModal) ventanaModal.close();
+    } catch (err) {
+        console.error('Error al modificar:', err);
+    }
 });
 
-ipcMain.on('eliminar-registro', (event, id) => {
-    if (mainWindow) mainWindow.webContents.send('registro-eliminado', id);
-    if (ventanaModal) ventanaModal.close();
-    });
+// 3. ELIMINAR DE LA NUBE
+ipcMain.on('eliminar-registro', async (event, id) => {
+    try {
+        await Estudiante.findByIdAndDelete(id);
+        if (mainWindow) mainWindow.webContents.send('registro-eliminado', id);
+        if (ventanaModal) ventanaModal.close();
+    } catch (err) {
+        console.error('Error al eliminar:', err);
+    }
+});
 
 ipcMain.on('cerrar-modal', () => {
     if (ventanaModal) ventanaModal.close();
-    });
+});

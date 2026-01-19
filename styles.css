@@ -1,17 +1,13 @@
-/* ==============================
-   EduFiles — estilos globales
-   Paleta: blanco / celeste / celeste oscuro / grises
-   ============================== */
 
 :root {
   --c-bg: #ffffff;
-  --c-surface: #f3f5f7; /* gris clarito para separar secciones */
+  --c-surface: #f3f5f7; 
   --c-border: #d7dde3;
 
-  --c-primary: #2daae1; /* celeste institucional */
-  --c-primary-dark: #167ab3; /* celeste oscuro */
+  --c-primary: #2daae1; 
+  --c-primary-dark: #167ab3; 
 
-  --c-text: #111827; /* gris oscuro/casi negro para texto */
+  --c-text: #111827; 
   --c-text-muted: #4b5563;
 
   --radius: 16px;
