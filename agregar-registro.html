@@ -168,34 +168,33 @@
         }
 
         document.getElementById('formRegistro').addEventListener('submit', async (e) => {
-            e.preventDefault();
+         e.preventDefault();
 
-            const foto = await getFotoDataUrl();
+        const foto = await getFotoDataUrl();
 
-            const datos = {
-                id: Date.now(),
-                nombres: document.getElementById('nombre').value,
-                apellidos: document.getElementById('apellidos').value,
-                edad: Number(document.getElementById('edad').value),
-                cedulaEstudiante: document.getElementById('cedulaEstudiante').value,
-                fechaNacimiento: document.getElementById('fechaNacimiento').value,
-                sexo: document.getElementById('sexo').value,
-                jornada: document.getElementById('jornada').value,
-                anioLectivo: document.getElementById('anioLectivo').value,
-                email: document.getElementById('email').value,
-                telefono: document.getElementById('telefono').value,
-                curso: document.getElementById('curso').value,
-                direccion: document.getElementById('direccion').value,
-                nombreRepresentante: document.getElementById('nombreRepresentante').value,
-                cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
-                telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
-                foto: foto
-            };
+        // Recolectamos todos los campos del formulario
+        const datos = {
+        nombres: document.getElementById('nombre').value,
+        apellidos: document.getElementById('apellidos').value,
+        edad: Number(document.getElementById('edad').value),
+        cedulaEstudiante: document.getElementById('cedulaEstudiante').value,
+        fechaNacimiento: document.getElementById('fechaNacimiento').value,
+        sexo: document.getElementById('sexo').value,
+        jornada: document.getElementById('jornada').value,
+        anioLectivo: document.getElementById('anioLectivo').value,
+        email: document.getElementById('email').value,
+        telefono: document.getElementById('telefono').value,
+        curso: document.getElementById('curso').value,
+        direccion: document.getElementById('direccion').value,
+        nombreRepresentante: document.getElementById('nombreRepresentante').value,
+        cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
+        telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
+        foto: foto
+        };
 
-            store.addStudent(datos);
-
-            ipcRenderer.send('guardar-registro', datos);
-        });
+        // Enviamos al main.js para que mongoose lo guarde en Atlas
+        ipcRenderer.send('guardar-registro', datos);
+     });
 
         document.getElementById('btnCancelar').addEventListener('click', () => {
             ipcRenderer.send('cerrar-modal');

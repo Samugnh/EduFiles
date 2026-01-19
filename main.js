@@ -12,11 +12,25 @@ mongoose.connect(mongoURI)
     .catch(err => console.error('Error de conexión:', err));
 
 // Definimos el esquema del Estudiante para la nube
+// --- ESQUEMA COMPLETO PARA EDUFILES ---
+// --- ESQUEMA DEFINITIVO PARA MONGODB ---
 const EstudianteSchema = new mongoose.Schema({
-    nombre: String,
-    apellido: String,
-    cedula: String,
+    nombres: String,
+    apellidos: String,
+    edad: Number,
+    cedulaEstudiante: String,
+    fechaNacimiento: String,
+    sexo: String,
+    jornada: String,
+    anioLectivo: String,
+    email: String,
+    telefono: String,
     curso: String,
+    direccion: String,
+    nombreRepresentante: String,
+    cedulaRepresentante: String,
+    telefonoRepresentante: String,
+    foto: String, // Se guarda como Base64 (DataURL)
     fechaRegistro: { type: Date, default: Date.now }
 });
 
@@ -113,11 +127,15 @@ ipcMain.on('abrir-modal', (event, tipo, payload) => {
 ipcMain.on('guardar-registro', async (event, datos) => {
     try {
         const nuevoEstudiante = new Estudiante(datos);
-        await nuevoEstudiante.save();
+        await nuevoEstudiante.save(); // Aquí se sube a internet
+        
+        // Notificamos a la ventana principal para que actualice la tabla
         if (mainWindow) mainWindow.webContents.send('registro-guardado', datos);
         if (ventanaModal) ventanaModal.close();
+        
+        console.log("Estudiante guardado en la nube:", datos.nombres);
     } catch (err) {
-        console.error('Error al guardar:', err);
+        console.error('Error al guardar en MongoDB:', err);
     }
 });
 
