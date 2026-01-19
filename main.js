@@ -5,7 +5,7 @@ const mongoose = require('mongoose'); // <--- Añadido para la base de datos
 
 // --- CONFIGURACIÓN DE MONGODB ---
 
-const mongoURI = 'mongodb+srv://samugnh2022v_db_user:l4glcrTCG8L0nk8@cluster0.abcde.mongodb.net/EduFiles?retryWrites=true&w=majority';
+const mongoURI = 'mongodb+srv://samugnh2022v_db_user:l4gIcrGTCG8L0nk8@cluster0.8p0grkz.mongodb.net/?appName=Cluster0';
 
 mongoose.connect(mongoURI)
     .then(() => console.log('Conectado a MongoDB Atlas'))
