@@ -18,7 +18,7 @@ function renderResults(query) {
     if (!container) return;
 
     const filtro = normalizar(query);
-    
+
     // Filtramos la lista que bajamos de la nube
     const matches = estudiantesEnNube.filter(s => {
         const nombreCompleto = normalizar(`${s.nombres} ${s.apellidos}`);
@@ -38,11 +38,19 @@ function renderResults(query) {
         div.className = 'resultado-item'; // Puedes darle estilo en styles.css
         div.style.padding = "10px";
         div.style.borderBottom = "1px solid #ccc";
-        
+        div.style.cursor = "pointer"; // Cursor de mano para indicar clickeable
+
         div.innerHTML = `
             <strong>${s.nombres} ${s.apellidos}</strong> — ${s.curso || 'Sin curso'} <br>
             <small>Cédula: ${s.cedulaEstudiante} | Jornada: ${s.jornada}</small>
         `;
+
+        // Evento click para abrir la modal
+        div.addEventListener('click', () => {
+            const idUnico = s._id.toString();
+            ipcRenderer.send('abrir-modal', 'detalle', { id: idUnico });
+        });
+
         container.appendChild(div);
     }
 }

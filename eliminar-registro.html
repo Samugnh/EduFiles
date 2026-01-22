@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduFiles — Eliminar Registro</title>
     <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
+
 <body class="modal modal-eliminar">
     <div class="container">
         <h2>🗑️ Eliminar Registro</h2>
@@ -29,19 +31,37 @@
 
         <div class="botones">
             <button type="button" class="btn-cancelar" onclick="cerrar()">Cancelar</button>
-            <button type="button" class="btn-eliminar" id="btnEliminar" onclick="eliminarRegistro()" disabled>Eliminar</button>
+            <button type="button" class="btn-eliminar" id="btnEliminar" onclick="eliminarRegistro()"
+                disabled>Eliminar</button>
         </div>
     </div>
 
     <script>
         const { ipcRenderer } = require('electron');
-        const store = require('./studentStore');
+
         let estudianteSeleccionado = null;
+        let estudiantesCaché = [];
 
-        function buscarEstudiante() {
-            const query = document.getElementById('buscarNombre').value;
+        async function buscarEstudiante() {
+            const query = document.getElementById('buscarNombre').value.trim().toLowerCase();
+            if (!query) return;
 
-            const matches = store.findStudentsByQuery(query);
+            try {
+                estudiantesCaché = await ipcRenderer.invoke('obtener-estudiantes');
+            } catch (err) {
+                console.error(err);
+                alert("Error obteniendo estudiantes de la base de datos");
+                return;
+            }
+
+            const normalize = (text) => text ? text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+            const filtro = normalize(query);
+
+            const matches = estudiantesCaché.filter(s => {
+                const full = normalize(`${s.nombres} ${s.apellidos}`);
+                return full.includes(filtro);
+            });
+
             if (matches.length === 1) {
                 const encontrado = matches[0];
                 estudianteSeleccionado = encontrado;
@@ -53,15 +73,17 @@
                 document.getElementById('btnEliminar').disabled = false;
             } else if (matches.length === 0) {
                 alert('Estudiante no encontrado');
-                estudianteSeleccionado = null;
-                document.getElementById('infoEstudiante').classList.remove('visible');
-                document.getElementById('btnEliminar').disabled = true;
+                reset();
             } else {
                 alert(`Se encontraron ${matches.length} estudiantes. Especifica mejor el nombre/apellido.`);
-                estudianteSeleccionado = null;
-                document.getElementById('infoEstudiante').classList.remove('visible');
-                document.getElementById('btnEliminar').disabled = true;
+                reset();
             }
+        }
+
+        function reset() {
+            estudianteSeleccionado = null;
+            document.getElementById('infoEstudiante').classList.remove('visible');
+            document.getElementById('btnEliminar').disabled = true;
         }
 
         function eliminarRegistro() {
@@ -69,10 +91,12 @@
 
             const fullName = `${estudianteSeleccionado.nombres || ''} ${estudianteSeleccionado.apellidos || ''}`.trim();
             if (confirm(`¿Estás seguro de eliminar a ${fullName}?`)) {
-                store.deleteStudent(estudianteSeleccionado.id);
-
-                ipcRenderer.send('eliminar-registro', estudianteSeleccionado.id);
-                cerrar();
+                // Enviamos el _id de mongo
+                ipcRenderer.send('eliminar-registro', estudianteSeleccionado._id);
+                // No llamamos a cerrar() aquí si queremos mostrar alerta de éxito primero, 
+                // pero el handler en main cierra la ventana.
+                // Si preferimos cerrar ya:
+                // cerrar();
             }
         }
 
@@ -81,4 +105,5 @@
         }
     </script>
 </body>
+
 </html>

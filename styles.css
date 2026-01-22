@@ -1,13 +1,12 @@
-
 :root {
   --c-bg: #ffffff;
-  --c-surface: #f3f5f7; 
+  --c-surface: #f3f5f7;
   --c-border: #d7dde3;
 
-  --c-primary: #2daae1; 
-  --c-primary-dark: #167ab3; 
+  --c-primary: #2daae1;
+  --c-primary-dark: #167ab3;
 
-  --c-text: #111827; 
+  --c-text: #111827;
   --c-text-muted: #4b5563;
 
   --radius: 16px;
@@ -45,9 +44,7 @@ h2 {
   display: none !important;
 }
 
-/* ==============================
-   Barra de navegación
-   ============================== */
+/*Barra de navegación*/
 
 .contenedor-nav {
   display: flex;
@@ -79,9 +76,7 @@ h2 {
   opacity: 1;
 }
 
-/* ==============================
-   Inicio (cards de estudiantes)
-   ============================== */
+/*Inicio (cards de estudiantes)*/
 
 .contenedor-carpetas {
   display: flex;
@@ -132,9 +127,7 @@ h2 {
   background: var(--c-surface);
 }
 
-/* ==============================
-   Desarrolladores
-   ============================== */
+/*Desarrolladores*/
 
 .contenedor-dev {
   display: flex;
@@ -188,9 +181,7 @@ h2 {
   text-align: center;
 }
 
-/* ==============================
-   Búsqueda
-   ============================== */
+/* Búsqueda*/
 
 .contenedor-buscar {
   display: flex;
@@ -256,9 +247,7 @@ button i {
   gap: 12px;
 }
 
-/* ==============================
-   Registros
-   ============================== */
+/*Registros*/
 
 .contenedor-registros {
   background-color: var(--c-surface);
@@ -297,10 +286,7 @@ button i {
   transform: translateY(-2px);
 }
 
-/* ==============================
-   Modales (agregar/modificar/eliminar/ver)
-   — estilos compartidos
-   ============================== */
+/*Ventanas Modales o MiniVentanas (agregar/modificar/eliminar/ver)*/
 
 .modal {
   background: var(--c-surface);
@@ -418,7 +404,7 @@ button i {
   transform: translateY(-1px);
 }
 
-/* Foto preview (agregar / modificar) */
+/* Foto preview (agregar / modificar)*/
 .foto-preview-wrap {
   margin-top: 10px;
   display: flex;
@@ -434,7 +420,7 @@ button i {
   background: var(--c-surface);
 }
 
-/* Eliminar */
+/*Eliminar*/
 .modal-eliminar .info-estudiante {
   display: none;
   padding: 16px;
@@ -480,7 +466,7 @@ button i {
   transform: none;
 }
 
-/* Ver detalle */
+/*Ver detalle*/
 .modal-ver .header {
   display: flex;
   align-items: center;
@@ -543,4 +529,49 @@ button i {
   color: #fff;
   font-weight: 700;
   margin-bottom: 14px;
+}
+
+
+.contenedor-carpetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.estudiante-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 1px solid #ddd;
+}
+
+.estudiante-card:hover {
+  transform: scale(1.05);
+  background: #f0f9ff;
+}
+
+.card-foto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  /*Foto redonda dentro del cuadro*/
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 3px solid #3498db;
+}
+
+.card-nombre {
+  font-size: 1rem;
+  color: #2c3e50;
+  margin: 5px 0;
+}
+
+.card-curso {
+  font-size: 0.85rem;
+  color: #7f8c8d;
 }

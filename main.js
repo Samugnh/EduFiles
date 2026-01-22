@@ -1,177 +1,156 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
-const https = require('https');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const mongoose = require('mongoose');
 const path = require('path');
-const mongoose = require('mongoose'); // <--- Añadido para la base de datos
 
-// --- CONFIGURACIÓN DE MONGODB ---
+let mainWindow;
 
-const mongoURI = 'mongodb+srv://samugnh2022v_db_user:l4gIcrGTCG8L0nk8@cluster0.8p0grkz.mongodb.net/?appName=Cluster0';
+// Conexión a MongoDB Atlas
+const mongoURI = "mongodb+srv://samugnh2022v_db_user:l4gIcrGTCG8L0nk8@cluster0.8p0grkz.mongodb.net/?appName=Cluster0";
 
 mongoose.connect(mongoURI)
     .then(() => console.log('Conectado a MongoDB Atlas'))
     .catch(err => console.error('Error de conexión:', err));
 
-// Definimos el esquema del Estudiante para la nube
-// --- ESQUEMA COMPLETO PARA EDUFILES ---
-// --- ESQUEMA DEFINITIVO PARA MONGODB ---
-const EstudianteSchema = new mongoose.Schema({
-    nombres: String,
-    apellidos: String,
-    edad: Number,
-    cedulaEstudiante: String,
-    fechaNacimiento: String,
-    sexo: String,
-    jornada: String,
-    anioLectivo: String,
-    email: String,
-    telefono: String,
-    curso: String,
-    direccion: String,
-    nombreRepresentante: String,
-    cedulaRepresentante: String,
-    telefonoRepresentante: String,
-    foto: String, // Se guarda como Base64 (DataURL)
-    fechaRegistro: { type: Date, default: Date.now }
-});
+const Estudiante = mongoose.model('Estudiante', new mongoose.Schema({
+    nombres: String, apellidos: String, curso: String, edad: String,
+    cedulaEstudiante: String, fechaNacimiento: String, sexo: String,
+    jornada: String, anioLectivo: String, email: String, telefono: String,
+    direccion: String, nombreRepresentante: String, cedulaRepresentante: String,
+    telefonoRepresentante: String, foto: String, fechaRegistro: { type: Date, default: Date.now }
+}));
 
-const Estudiante = mongoose.model('Estudiante', EstudianteSchema);
-
-let mainWindow;
-let ventanaModal;
-
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1920,
-    height: 1080,
-    icon: path.join(__dirname, 'icon-small.ico'), 
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  });
-
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+function createMainWindow() {
+    mainWindow = new BrowserWindow({
+        width: 1200, height: 800,
+        webPreferences: { nodeIntegration: true, contextIsolation: false }
+    });
+    mainWindow.loadFile('index.html');
 }
 
-// --- FUNCIÓN PARA VERIFICAR ACTUALIZACIONES ---
-function verificarActualizacion() {
-    const url = 'https://api.github.com/repos/Samugnh/EduFiles/releases/latest';
-    https.get(url, { headers: { 'User-Agent': 'mi-app' } }, (res) => {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => {
-            try {
-                const release = JSON.parse(data);
-                const versionNueva = release.tag_name.replace('v', '');
-                const versionActual = app.getVersion();
-                if (versionNueva > versionActual) {
-                    dialog.showMessageBox({
-                        type: 'info',
-                        title: 'Actualización disponible',
-                        message: `Hay una versión nueva: ${versionNueva}`,
-                        buttons: ['Descargar', 'Más tarde']
-                    }).then(result => {
-                        if (result.response === 0) shell.openExternal(release.html_url);
-                    });
-                }
-            } catch (e) { console.log(e); }
-        });
+function createModalWindow(type, data) {
+    let modalWindow = new BrowserWindow({
+        width: 850, height: 700, parent: mainWindow, modal: true, show: false,
+        webPreferences: { nodeIntegration: true, contextIsolation: false }
+    });
+
+    const queryParams = (data && data.id) ? `?id=${data.id}` : '';
+
+    let fileTarget = 'Registros.html';
+    switch (type) {
+        case 'detalle':
+            fileTarget = 'ver-registro.html';
+            break;
+        case 'agregar':
+            fileTarget = 'agregar-registro.html';
+            break;
+        case 'modificar':
+            fileTarget = 'modificar-registro.html';
+            break;
+        case 'eliminar':
+            fileTarget = 'eliminar-registro.html';
+            break;
+        default:
+            fileTarget = 'Registros.html';
+    }
+
+    modalWindow.loadFile(path.join(__dirname, fileTarget), { search: queryParams });
+
+    modalWindow.once('ready-to-show', () => {
+        if (modalWindow && !modalWindow.isDestroyed()) modalWindow.show();
     });
 }
 
-function createModalWindow(tipo, payload) {
-    if (ventanaModal) ventanaModal.close();
-
-    ventanaModal = new BrowserWindow({
-        width: tipo === 'detalle' ? 650 : 500,
-        height: tipo === 'eliminar' ? 300 : 650,
-        parent: mainWindow,
-        modal: true,
-        show: false,
-        resizable: false,
-        icon: path.join(__dirname, 'icon-small.ico'),
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        }
-    });
-
-    if (tipo === 'agregar') ventanaModal.loadFile('agregar-registro.html');
-    else if (tipo === 'modificar') ventanaModal.loadFile('modificar-registro.html');
-    else if (tipo === 'eliminar') ventanaModal.loadFile('eliminar-registro.html');
-    else if (tipo === 'detalle') {
-        const id = payload && payload.id ? String(payload.id) : '';
-        ventanaModal.loadFile('ver-registro.html', { query: { id: id } });
-    }
-
-    ventanaModal.once('ready-to-show', () => ventanaModal.show());
-    ventanaModal.on('closed', () => ventanaModal = null);
-}
-
-app.whenReady().then(() => {
-    createWindow();
-    verificarActualizacion();
-});
-
-// --- EVENTOS IPC ACTUALIZADOS PARA LA NUBE ---
-
-ipcMain.on('abrir-modal', (event, tipo, payload) => {
-    createModalWindow(tipo, payload);
-});
-
-// 1. GUARDAR EN LA NUBE
-ipcMain.on('guardar-registro', async (event, datos) => {
-    try {
-        const nuevoEstudiante = new Estudiante(datos);
-        await nuevoEstudiante.save(); // Aquí se sube a internet
-        
-        // Notificamos a la ventana principal para que actualice la tabla
-        if (mainWindow) mainWindow.webContents.send('registro-guardado', datos);
-        if (ventanaModal) ventanaModal.close();
-        
-        console.log("Estudiante guardado en la nube:", datos.nombres);
-    } catch (err) {
-        console.error('Error al guardar en MongoDB:', err);
-    }
-});
-
-// 2. MODIFICAR EN LA NUBE
-ipcMain.on('modificar-registro', async (event, datos) => {
-    try {
-        await Estudiante.findByIdAndUpdate(datos.id, datos);
-        if (mainWindow) mainWindow.webContents.send('registro-modificado', datos);
-        if (ventanaModal) ventanaModal.close();
-    } catch (err) {
-        console.error('Error al modificar:', err);
-    }
-});
-
-// 3. ELIMINAR DE LA NUBE
-ipcMain.on('eliminar-registro', async (event, id) => {
-    try {
-        await Estudiante.findByIdAndDelete(id);
-        if (mainWindow) mainWindow.webContents.send('registro-eliminado', id);
-        if (ventanaModal) ventanaModal.close();
-    } catch (err) {
-        console.error('Error al eliminar:', err);
-    }
-});
-
-// EVENTO PARA BUSCAR TODOS LOS ESTUDIANTES EN LA NUBE
 ipcMain.handle('obtener-estudiantes', async () => {
     try {
-        // Trae todos los registros de la base de datos
-        return await Estudiante.find().lean(); 
-    } catch (err) {
-        console.error('Error al obtener datos:', err);
+        const docs = await Estudiante.find().sort({ fechaRegistro: -1 }).lean();
+        // Convertir _id a string para evitar problemas de serialización en el renderer
+        return docs.map(d => ({ ...d, _id: d._id.toString() }));
+    }
+    catch (err) {
+        console.error("Error obteniendo estudiantes:", err);
         return [];
     }
 });
 
-ipcMain.on('cerrar-modal', () => {
-    if (ventanaModal) ventanaModal.close();
+// ESTA FUNCIÓN ES LA QUE EVITA QUE LA INFO SE REPITA
+ipcMain.handle('obtener-estudiante-por-id', async (event, id) => {
+    try {
+        console.log("Buscando estudiante con ID:", id);
+        const s = await Estudiante.findById(id).lean();
+        if (s) {
+            s._id = s._id.toString();
+        }
+        return s;
+    }
+    catch (err) {
+        console.error("Error buscando estudiante por ID:", err);
+        return null;
+    }
 });
+
+ipcMain.on('guardar-registro', async (event, data) => {
+    try {
+        const nuevoEstudiante = new Estudiante(data);
+        await nuevoEstudiante.save();
+
+        // Avisar a la ventana principal para actualizar la vista
+        if (mainWindow) {
+            mainWindow.webContents.send('registro-guardado');
+        }
+
+        // Cerrar la ventana modal (la que envió el evento)
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win) win.close();
+
+    } catch (err) {
+        console.error('Error al guardar estudiante:', err);
+        // Opcional: enviar error de vuelta al renderer si quisieras mostrar alerta
+    }
+});
+
+// MODIFICAR
+ipcMain.on('modificar-registro', async (event, data) => {
+    try {
+        // data debe tener { id: "...", ...campos }
+        // En mongoose usamos findByIdAndUpdate
+        // data.id viene del renderer, asegúrate de que sea el _id de mongo o mapearlo
+        const { id, ...resto } = data;
+
+        await Estudiante.findByIdAndUpdate(id, resto);
+
+        if (mainWindow) {
+            mainWindow.webContents.send('registro-modificado');
+        }
+
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win) win.close();
+
+    } catch (err) {
+        console.error('Error al modificar estudiante:', err);
+    }
+});
+
+// ELIMINAR
+ipcMain.on('eliminar-registro', async (event, id) => {
+    try {
+        await Estudiante.findByIdAndDelete(id);
+
+        if (mainWindow) {
+            mainWindow.webContents.send('registro-eliminado');
+        }
+
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win) win.close();
+
+    } catch (err) {
+        console.error('Error al eliminar estudiante:', err);
+    }
+});
+
+ipcMain.on('abrir-modal', (event, type, data) => createModalWindow(type, data));
+ipcMain.on('cerrar-modal', () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win && win !== mainWindow) win.close();
+});
+
+app.whenReady().then(createMainWindow);

@@ -1,45 +1,66 @@
-# 📁 EduFiles - Proyecto de Grado
+# 📁 EduFiles - Sistema de Gestión Estudiantil
 
-**EduFiles** es una aplicación de escritorio desarrollada con **Electron.js** diseñada para gestionar la informacion de estudiantes
+**EduFiles** es una aplicación de escritorio robusta y moderna desarrollada con **Electron.js**, diseñada para simplificar la gestión de información estudiantil. Permite administrar registros académicos de manera eficiente, segura y local.
 
-## 🚀 Descarga e Instalación
+---
 
-Para probar la aplicación sin necesidad de instalar el código, puedes descargar el ejecutable directamente desde nuestra sección de lanzamientos:
+## ✨ Características Principales
 
-👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v1.0.0/EduFiles.Setup.1.0.0.exe)**
+*   **📋 Gestión Completa (CRUD):**
+    *   **Crear:** Agrega nuevos estudiantes con detalles completos.
+    *   **Leer:** Visualiza la lista de estudiantes organizada automáticamente.
+    *   **Actualizar:** Modifica la información existente fácilmente.
+    *   **Eliminar:** Borra registros obsoletos.
+*   **🔍 Búsqueda Inteligente:** Filtra estudiantes por nombre o apellido en tiempo real.
+*   **💾 Almacenamiento en la nube:** Los datos se guardan en una base de datos llamada MongoDB lo cual facilita el uso de la aplicacion en cualquier computadora.
+*   **🎨 Interfaz Intuitiva:** Diseño limpio y fácil de usar.
 
-## 🛠️ Tecnologías Utilizadas
-
-* **Framework:** Electron.js
-* **Frontend:** HTML5, CSS3, JavaScript
-* **Control de Versiones:** Git & GitHub
-
-## 📦 Instalación para Desarrolladores
-
-Si deseas clonar este proyecto y ejecutarlo en tu entorno local, sigue estos pasos:
-
-1. Instala las dependencias:
-   ```bash
-   npm install# 📁 EduFiles - Proyecto de Grado
-
-**EduFiles** es una aplicación de escritorio desarrollada con **Electron.js** diseñada para (escribe aquí el objetivo principal de tu app, ej: gestionar archivos educativos de forma eficiente).
+---
 
 ## 🚀 Descarga e Instalación
 
-Para probar la aplicación sin necesidad de instalar el código, puedes descargar el ejecutable directamente desde nuestra sección de lanzamientos:
+### Opción 1: Ejecutable (Windows)
+Para usar la aplicación inmediatamente sin configurar nada:
+👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v.0.0/EduFiles.Setup.1.0.0.exe)**
 
-👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v1.0.0/EduFiles.Setup.1.0.0.exe)**
+### Opción 2: Para Desarrolladores (Código Fuente)
+
+Si deseas explorar el código o contribuir, sigue estos pasos:
+
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone https://github.com/Samugnh/EduFiles.git
+    cd EduFiles
+    ```
+
+2.  **Instalar dependencias:**
+    ```bash
+    npm install
+    ```
+
+3.  **Ejecutar en modo desarrollo:**
+    ```bash
+    npm start
+    ```
+
+---
 
 ## 🛠️ Tecnologías Utilizadas
 
-* **Framework:** Electron.js
-* **Frontend:** HTML5, CSS3, JavaScript
-* **Control de Versiones:** Git & GitHub
+*   **Core:** [Electron.js](https://www.electronjs.org/)
+*   **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
+*   **Persistencia:** Base de Datos(MongoDB)
+*   **Control de Versiones:** Git & GitHub
 
-## 📦 Instalación para Desarrolladores
+---
 
-Si deseas clonar este proyecto y ejecutarlo en tu entorno local, sigue estos pasos:
+## 📂 Estructura del Proyecto
 
-1. Instala las dependencias:
-   ```bash
-   npm install
+*   `main.js`: Proceso principal de Electron.
+*   `studentStore.js`: Lógica de almacenamiento y manipulación de datos.
+*   `*.html`: Vistas de la aplicación (Lista, Agregar, Buscar, etc.).
+*   `styles.css`: Estilos globales.
+
+---
+
+Hecho por [Samugnh](https://github.com/Samugnh)

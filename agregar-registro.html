@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduFiles — Agregar Registro</title>
     <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
+
 <body class="modal modal-agregar">
     <div class="container">
         <h2>📝 Agregar Nuevo Registro</h2>
@@ -23,7 +25,7 @@
 
             <div class="form-group">
                 <label for="edad">Edad:</label>
-                <input type="number" id="edad" min="5" max="18" required>
+                <input type="number" id="edad" min="5" max="29" required>
             </div>
 
             <div class="form-group">
@@ -168,37 +170,38 @@
         }
 
         document.getElementById('formRegistro').addEventListener('submit', async (e) => {
-         e.preventDefault();
+            e.preventDefault();
 
-        const foto = await getFotoDataUrl();
+            const foto = await getFotoDataUrl();
 
-        // Recolectamos todos los campos del formulario
-        const datos = {
-        nombres: document.getElementById('nombre').value,
-        apellidos: document.getElementById('apellidos').value,
-        edad: Number(document.getElementById('edad').value),
-        cedulaEstudiante: document.getElementById('cedulaEstudiante').value,
-        fechaNacimiento: document.getElementById('fechaNacimiento').value,
-        sexo: document.getElementById('sexo').value,
-        jornada: document.getElementById('jornada').value,
-        anioLectivo: document.getElementById('anioLectivo').value,
-        email: document.getElementById('email').value,
-        telefono: document.getElementById('telefono').value,
-        curso: document.getElementById('curso').value,
-        direccion: document.getElementById('direccion').value,
-        nombreRepresentante: document.getElementById('nombreRepresentante').value,
-        cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
-        telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
-        foto: foto
-        };
+            // Recolectamos todos los campos del formulario
+            const datos = {
+                nombres: document.getElementById('nombre').value,
+                apellidos: document.getElementById('apellidos').value,
+                edad: Number(document.getElementById('edad').value),
+                cedulaEstudiante: document.getElementById('cedulaEstudiante').value,
+                fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                sexo: document.getElementById('sexo').value,
+                jornada: document.getElementById('jornada').value,
+                anioLectivo: document.getElementById('anioLectivo').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                curso: document.getElementById('curso').value,
+                direccion: document.getElementById('direccion').value,
+                nombreRepresentante: document.getElementById('nombreRepresentante').value,
+                cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
+                telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
+                foto: foto
+            };
 
-        // Enviamos al main.js para que mongoose lo guarde en Atlas
-        ipcRenderer.send('guardar-registro', datos);
-     });
+            // Enviamos al main.js para que mongoose lo guarde en Atlas
+            ipcRenderer.send('guardar-registro', datos);
+        });
 
         document.getElementById('btnCancelar').addEventListener('click', () => {
             ipcRenderer.send('cerrar-modal');
         });
     </script>
 </body>
+
 </html>

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduFiles — Modificar Registro</title>
     <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
+
 <body class="modal modal-modificar">
     <div class="container">
         <h2>✏️ Modificar Registro</h2>
@@ -18,7 +20,7 @@
 
         <form id="formModificar">
             <input type="hidden" id="registroId">
-            
+
             <div class="form-group">
                 <label for="nombre">Nombre del Estudiante:</label>
                 <input type="text" id="nombre" required>
@@ -31,7 +33,7 @@
 
             <div class="form-group">
                 <label for="edad">Edad:</label>
-                <input type="number" id="edad" min="5" max="18" required>
+                <input type="number" id="edad" min="5" max="29" required>
             </div>
 
             <div class="form-group">
@@ -126,7 +128,6 @@
 
     <script>
         const { ipcRenderer } = require('electron');
-        const store = require('./studentStore');
 
         const DEFAULT_PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
             `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
@@ -160,6 +161,7 @@
         }
 
         let estudianteActual = null;
+        let estudiantesCaché = [];
 
         const fotoPreview = document.getElementById('fotoPreview');
         if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
@@ -186,14 +188,35 @@
 
         setFormEnabled(false);
 
-        function buscarEstudiante() {
-            const query = document.getElementById('buscarNombre').value;
+        async function buscarEstudiante() {
+            const query = document.getElementById('buscarNombre').value.trim().toLowerCase();
+            if (!query) return;
 
-            const matches = store.findStudentsByQuery(query);
+            // Traer todos de MongoDB para filtrar (o implementar búsqueda en backend)
+            // Para simplicidad y consistencia con buscar.js, traemos todos.
+            try {
+                estudiantesCaché = await ipcRenderer.invoke('obtener-estudiantes');
+            } catch (err) {
+                console.error(err);
+                alert("Error obteniendo estudiantes de la base de datos");
+                return;
+            }
+
+            const normalize = (text) => text ? text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+            const filtro = normalize(query);
+
+            const matches = estudiantesCaché.filter(s => {
+                const full = normalize(`${s.nombres} ${s.apellidos}`);
+                return full.includes(filtro);
+            });
+
             if (matches.length === 1) {
                 const encontrado = matches[0];
                 estudianteActual = encontrado;
-                document.getElementById('registroId').value = encontrado.id;
+
+                // Usamos _id de mongo
+                document.getElementById('registroId').value = encontrado._id;
+
                 document.getElementById('nombre').value = encontrado.nombres || '';
                 document.getElementById('apellidos').value = encontrado.apellidos || '';
                 document.getElementById('edad').value = encontrado.edad ?? '';
@@ -209,34 +232,39 @@
                 document.getElementById('nombreRepresentante').value = encontrado.nombreRepresentante || '';
                 document.getElementById('cedulaRepresentante').value = encontrado.cedulaRepresentante || '';
                 document.getElementById('telefonoRepresentante').value = encontrado.telefonoRepresentante || '';
+
                 if (fotoPreview) fotoPreview.src = encontrado.foto || DEFAULT_PHOTO;
                 setFormEnabled(true);
+
             } else if (matches.length === 0) {
                 alert('Estudiante no encontrado');
-                estudianteActual = null;
-                document.getElementById('registroId').value = '';
-                if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
-                setFormEnabled(false);
+                resetForm();
             } else {
                 alert(`Se encontraron ${matches.length} estudiantes. Especifica mejor el nombre/apellido.`);
-                estudianteActual = null;
-                document.getElementById('registroId').value = '';
-                if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
-                setFormEnabled(false);
+                resetForm();
             }
+        }
+
+        function resetForm() {
+            estudianteActual = null;
+            document.getElementById('registroId').value = '';
+            if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
+            setFormEnabled(false);
+            // Limpiar campos visualmente si quieres
+            document.getElementById('formModificar').reset();
         }
 
         document.getElementById('formModificar').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const idRaw = document.getElementById('registroId').value;
-            const id = parseInt(idRaw);
-            if (!idRaw || Number.isNaN(id)) {
+            const id = document.getElementById('registroId').value;
+            if (!id) {
                 alert('Primero busca y selecciona un estudiante.');
                 return;
             }
+
             const datos = {
-                id: id,
+                id: id, // ID de mongo
                 nombres: document.getElementById('nombre').value,
                 apellidos: document.getElementById('apellidos').value,
                 edad: Number(document.getElementById('edad').value),
@@ -260,12 +288,6 @@
                 datos.foto = nuevaFoto;
             }
 
-            const updated = store.updateStudent(datos);
-            if (!updated) {
-                alert('No se pudo modificar: estudiante no existe (o fue eliminado).');
-                return;
-            }
-
             ipcRenderer.send('modificar-registro', datos);
         });
 
@@ -274,4 +296,5 @@
         });
     </script>
 </body>
+
 </html>
