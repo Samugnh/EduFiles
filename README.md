@@ -21,7 +21,7 @@
 
 ### Opción 1: Ejecutable (Windows)
 Para usar la aplicación inmediatamente sin configurar nada:
-👉 **[Descargar EduFiles v1.0.0](https://github.com/Samugnh/EduFiles/releases/download/v.0.0/EduFiles.Setup.1.0.0.exe)**
+👉 **[Descargar EduFiles v2.0.0](https://github.com/Samugnh/EduFiles/releases/download/v2.0.0/EduFiles.Setup.2.0.0.exe)**
 
 ### Opción 2: Para Desarrolladores (Código Fuente)
 
