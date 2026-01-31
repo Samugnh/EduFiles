@@ -1,36 +1,50 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+  <meta charset="utf-8">
 
-    <title>EduFiles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="styles.css" rel="stylesheet" type="text/css">
-  </head>
+  <title>EduFiles</title>
 
-  <body>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+</head>
 
-    <nav class="contenedor-nav">
-        <ul class="nav-list">
+<body>
 
-          <li><a href="index.html">Inicio</a></li>
+  <nav class="contenedor-nav">
+    <ul class="nav-list">
 
-          <li><a href="Registros.html">Registros</a></li>
+      <li><a href="index.html">Inicio</a></li>
 
-          <li><a href="Buscar.html">Buscar</a></li>
+      <li><a href="Registros.html">Registros</a></li>
 
-          <li><a href="Desarrolladores.html">Desarrolladores</a></li>
+      <li><a href="Buscar.html">Buscar</a></li>
 
-        </ul>
-    </nav>
+      <li><a href="Desarrolladores.html">Desarrolladores</a></li>
 
-    <h1>Gestor de Informacion Estudiantil</h1>
+    </ul>
+  </nav>
 
-    <div id="contenedorCarpetas" class="contenedor-carpetas"></div>
+  <h1>Gestor de Informacion Estudiantil</h1>
 
-    <script src="indexPage.js"></script>
-  </body>
+  <div id="contenedorCarpetas" class="contenedor-carpetas"></div>
+
+  <!-- Modal para mostrar estudiantes del curso -->
+  <div id="modalCurso" class="modal-curso">
+    <div class="modal-curso-content">
+      <div class="modal-curso-header">
+        <h2 id="tituloModalCurso">Curso</h2>
+        <span class="close-modal-curso">&times;</span>
+      </div>
+      <div id="contenidoModalCurso" class="modal-curso-body">
+        <!-- Aquí se cargarán los estudiantes -->
+      </div>
+    </div>
+  </div>
+
+  <script src="indexPage.js"></script>
+</body>
 
 </html>

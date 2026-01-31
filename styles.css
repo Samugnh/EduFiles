@@ -533,10 +533,14 @@ button i {
 
 
 .contenedor-carpetas {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  /* Un poco mas de espacio */
   padding: 20px;
+  width: 90%;
+  margin: 26px auto 40px;
 }
 
 .estudiante-card {
@@ -548,6 +552,8 @@ button i {
   cursor: pointer;
   transition: transform 0.2s;
   border: 1px solid #ddd;
+  width: 180px;
+  /* Ancho fijo para las cards de estudiantes para grid */
 }
 
 .estudiante-card:hover {
@@ -574,4 +580,192 @@ button i {
 .card-curso {
   font-size: 0.85rem;
   color: #7f8c8d;
+}
+
+/* Modificaciones para carpetas de cursos */
+.folder-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(17, 24, 39, 0.08);
+  /* Sombra más suave */
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--c-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  /* Ancho fijo */
+  height: 180px;
+}
+
+.folder-card:hover {
+  transform: translateY(-5px);
+  background: #fcfdfe;
+  box-shadow: 0 15px 30px rgba(45, 170, 225, 0.15);
+  /* Sombra azulada al hover */
+  border-color: var(--c-primary);
+}
+
+.folder-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 15px;
+}
+
+.folder-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--c-primary);
+  transition: fill 0.2s;
+}
+
+.folder-card:hover .folder-icon svg {
+  fill: var(--c-primary-dark);
+}
+
+.folder-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--c-text);
+}
+
+/* Modal de lista de estudiantes por curso */
+.modal-curso {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-curso.visible {
+  display: flex;
+}
+
+.modal-curso-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 900px;
+  border-radius: var(--radius);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-curso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.modal-curso-body {
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  /* Centrar items si hay pocos, o start */
+}
+
+.close-modal-curso {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal-curso:hover,
+.close-modal-curso:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Estilos de Impresión (imprimir.html) */
+
+.body-imprimir {
+  padding: 20px;
+}
+
+.recuadro {
+  border: 1px solid var(--c-border);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.recuadro h1 {
+  text-align: center;
+  color: #333;
+}
+
+.campo {
+  margin-bottom: 10px;
+}
+
+.etiqueta {
+  font-weight: bold;
+  color: var(--c-text-muted);
+}
+
+.foto-imprimir {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.foto-imprimir img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid var(--c-border);
+}
+
+.no-print {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btn-imprimir-action {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background: var(--c-primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-cerrar-action {
+  background: #999;
+  margin-left: 10px;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+.text-center {
+  text-align: center;
 }

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imprimir Estudiante</title>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body class="body-imprimir">
+    <div id="content" class="recuadro">
+        <p class="text-center">Cargando datos...</p>
+    </div>
+
+    <div class="no-print">
+        <button onclick="window.print()" class="btn-imprimir-action">Imprimir</button>
+        <button onclick="window.close()" class="btn-imprimir-action btn-cerrar-action">Cerrar</button>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        ipcRenderer.on('datos-impresion', (event, estudiante) => {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="foto-imprimir">
+                    <img src="${estudiante.foto || 'icon-small.ico'}" alt="Foto del estudiante" onerror="this.src='icon-small.ico'">
+                </div>
+                <h1>${estudiante.nombres} ${estudiante.apellidos}</h1>
+                
+                <div class="campo"><span class="etiqueta">Cédula:</span> ${estudiante.cedulaEstudiante || ''}</div>
+                <div class="campo"><span class="etiqueta">Fecha Nacimiento:</span> ${estudiante.fechaNacimiento || ''}</div>
+                <div class="campo"><span class="etiqueta">Edad:</span> ${estudiante.edad || ''}</div>
+                <div class="campo"><span class="etiqueta">Curso:</span> ${estudiante.curso || ''}</div>
+                <div class="campo"><span class="etiqueta">Jornada:</span> ${estudiante.jornada || ''}</div>
+                <div class="campo"><span class="etiqueta">Email:</span> ${estudiante.email || ''}</div>
+                
+                <hr>
+                <h3>Datos del Representante</h3>
+                <div class="campo"><span class="etiqueta">Nombre:</span> ${estudiante.nombreRepresentante || ''}</div>
+                <div class="campo"><span class="etiqueta">Cédula:</span> ${estudiante.cedulaRepresentante || ''}</div>
+                <div class="campo"><span class="etiqueta">Teléfono:</span> ${estudiante.telefonoRepresentante || ''}</div>
+                <div class="campo"><span class="etiqueta">Correo:</span> ${estudiante.correoRepresentante || ''}</div>
+            `;
+
+            // Auto-print option could be enabled here if desired, 
+            // but for now user has control via button or we can do it after a slight delay
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

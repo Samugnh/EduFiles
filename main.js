@@ -153,4 +153,25 @@ ipcMain.on('cerrar-modal', () => {
     if (win && win !== mainWindow) win.close();
 });
 
+// IMPRIMIR
+ipcMain.on('abrir-impresion', (event, estudiante) => {
+    let printWindow = new BrowserWindow({
+        width: 800, height: 600,
+        parent: mainWindow, // Opcional, si quieres que esté "ligada"
+        show: false, // Se muestra cuando esté lista
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+
+    printWindow.loadFile(path.join(__dirname, 'imprimir.html'));
+
+    printWindow.once('ready-to-show', () => {
+        printWindow.show();
+        // Enviar datos apenas esté lista la ventana
+        printWindow.webContents.send('datos-impresion', estudiante);
+    });
+});
+
 app.whenReady().then(createMainWindow);
