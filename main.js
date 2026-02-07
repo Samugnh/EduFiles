@@ -16,7 +16,10 @@ const Estudiante = mongoose.model('Estudiante', new mongoose.Schema({
     cedulaEstudiante: String, fechaNacimiento: String, sexo: String,
     jornada: String, anioLectivo: String, email: String, telefono: String,
     direccion: String, nombreRepresentante: String, cedulaRepresentante: String,
-    telefonoRepresentante: String, foto: String, fechaRegistro: { type: Date, default: Date.now }
+    telefonoRepresentante: String, foto: String, fechaRegistro: { type: Date, default: Date.now },
+    // Nuevos campos
+    codigoEstudiante: String, nacionalidad: String, etnia: String, discapacidad: String,
+    direccionRepresentante: String, descripcionObservaciones: String
 }));
 
 function createMainWindow() {

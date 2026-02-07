@@ -32,6 +32,26 @@
             </div>
 
             <div class="form-group">
+                <label for="codigoEstudiante">Código de Estudiante:</label>
+                <input type="text" id="codigoEstudiante">
+            </div>
+
+            <div class="form-group">
+                <label for="nacionalidad">Nacionalidad:</label>
+                <input type="text" id="nacionalidad">
+            </div>
+
+            <div class="form-group">
+                <label for="etnia">Etnia:</label>
+                <input type="text" id="etnia">
+            </div>
+
+            <div class="form-group">
+                <label for="discapacidad">Discapacidad (si aplica):</label>
+                <input type="text" id="discapacidad">
+            </div>
+
+            <div class="form-group">
                 <label for="edad">Edad:</label>
                 <input type="number" id="edad" min="5" max="29" required>
             </div>
@@ -100,7 +120,7 @@
             </div>
 
             <div class="form-group">
-                <label for="direccion">Dirección:</label>
+                <label for="direccion">Dirección Domiciliaria del Estudiante:</label>
                 <input type="text" id="direccion">
             </div>
 
@@ -117,6 +137,18 @@
             <div class="form-group">
                 <label for="telefonoRepresentante">Teléfono del Representante:</label>
                 <input type="text" id="telefonoRepresentante" required>
+            </div>
+
+            <div class="form-group">
+                <label for="direccionRepresentante">Dirección Domiciliaria del Representante:</label>
+                <input type="text" id="direccionRepresentante">
+            </div>
+
+            <hr>
+            <h3>Observaciones Generales</h3>
+            <div class="form-group">
+                <label for="descripcionObservaciones">Descripción:</label>
+                <textarea id="descripcionObservaciones" rows="3"></textarea>
             </div>
 
             <div class="botones">
@@ -179,7 +211,7 @@
         }
 
         function setFormEnabled(enabled) {
-            const ids = ['nombre', 'apellidos', 'edad', 'cedulaEstudiante', 'fechaNacimiento', 'sexo', 'jornada', 'anioLectivo', 'email', 'telefono', 'curso', 'direccion', 'nombreRepresentante', 'cedulaRepresentante', 'telefonoRepresentante'];
+            const ids = ['nombre', 'apellidos', 'edad', 'cedulaEstudiante', 'fechaNacimiento', 'sexo', 'jornada', 'anioLectivo', 'email', 'telefono', 'curso', 'direccion', 'nombreRepresentante', 'cedulaRepresentante', 'telefonoRepresentante', 'codigoEstudiante', 'nacionalidad', 'etnia', 'discapacidad', 'direccionRepresentante', 'descripcionObservaciones'];
             for (const id of ids) {
                 const el = document.getElementById(id);
                 if (el) el.disabled = !enabled;
@@ -233,6 +265,14 @@
                 document.getElementById('cedulaRepresentante').value = encontrado.cedulaRepresentante || '';
                 document.getElementById('telefonoRepresentante').value = encontrado.telefonoRepresentante || '';
 
+                // Nuevos campos
+                document.getElementById('codigoEstudiante').value = encontrado.codigoEstudiante || '';
+                document.getElementById('nacionalidad').value = encontrado.nacionalidad || '';
+                document.getElementById('etnia').value = encontrado.etnia || '';
+                document.getElementById('discapacidad').value = encontrado.discapacidad || '';
+                document.getElementById('direccionRepresentante').value = encontrado.direccionRepresentante || '';
+                document.getElementById('descripcionObservaciones').value = encontrado.descripcionObservaciones || '';
+
                 if (fotoPreview) fotoPreview.src = encontrado.foto || DEFAULT_PHOTO;
                 setFormEnabled(true);
 
@@ -280,6 +320,13 @@
                 nombreRepresentante: document.getElementById('nombreRepresentante').value,
                 cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
                 telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
+                // Nuevos campos
+                codigoEstudiante: document.getElementById('codigoEstudiante').value,
+                nacionalidad: document.getElementById('nacionalidad').value,
+                etnia: document.getElementById('etnia').value,
+                discapacidad: document.getElementById('discapacidad').value,
+                direccionRepresentante: document.getElementById('direccionRepresentante').value,
+                descripcionObservaciones: document.getElementById('descripcionObservaciones').value,
                 foto: (estudianteActual && estudianteActual.foto) || ''
             };
 

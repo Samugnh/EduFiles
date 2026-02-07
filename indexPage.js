@@ -65,7 +65,16 @@ async function cargarCarpetasEstudiantes() {
                         card.className = 'estudiante-card'; // Reutilizamos estilo de card
 
                         const nombreCompleto = `${estudiante.nombres || ''} ${estudiante.apellidos || ''}`;
-                        const fotoSrc = estudiante.foto || 'icon-small.ico';
+
+                        const DEFAULT_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
+                            `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+                                <rect width="128" height="128" rx="64" fill="#e5e7eb"/>
+                                <circle cx="64" cy="50" r="22" fill="#9ca3af"/>
+                                <path d="M26 116c7-22 25-34 38-34h0c13 0 31 12 38 34" fill="#9ca3af"/>
+                            </svg>`
+                        )}`;
+
+                        const fotoSrc = estudiante.foto || DEFAULT_SVG;
 
                         card.innerHTML = `
                             <img src="${fotoSrc}" class="card-foto" alt="Foto">

@@ -97,7 +97,14 @@ function imprimirEstudiante(estudiante) {
         nombreRepresentante: estudiante.nombreRepresentante,
         cedulaRepresentante: estudiante.cedulaRepresentante,
         telefonoRepresentante: estudiante.telefonoRepresentante,
-        correoRepresentante: estudiante.correoRepresentante
+        correoRepresentante: estudiante.correoRepresentante,
+        codigoEstudiante: estudiante.codigoEstudiante,
+        nacionalidad: estudiante.nacionalidad,
+        etnia: estudiante.etnia,
+        discapacidad: estudiante.discapacidad,
+        direccion: estudiante.direccion,
+        direccionRepresentante: estudiante.direccionRepresentante,
+        descripcionObservaciones: estudiante.descripcionObservaciones
     });
 }
 
