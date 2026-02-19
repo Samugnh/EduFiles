@@ -1,18 +1,59 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const mongoose = require('mongoose');
 const path = require('path');
+const https = require('https');
+const pkg = require('./package.json');
 
 let mainWindow;
 
-// Conexión a MongoDB Atlas
+// --- SISTEMA DE ACTUALIZACIONES (GITHUB) ---
+// Comprobamos si hay una nueva versión comparando nuestro package.json con el de GitHub
+function verificarActualizaciones() {
+    const url = 'https://raw.githubusercontent.com/Samugnh/EduFiles/main/package.json';
+
+    https.get(url, (res) => {
+        let body = '';
+        res.on('data', (chunk) => body += chunk);
+        res.on('end', () => {
+            try {
+                const remotePkg = JSON.parse(body);
+                const localVersion = pkg.version;
+                const remoteVersion = remotePkg.version;
+
+                if (remoteVersion !== localVersion) {
+                    console.log(`[Update] Nueva versión disponible: ${remoteVersion}`);
+                    if (mainWindow) {
+                        mainWindow.webContents.send('nueva-version', {
+                            local: localVersion,
+                            remota: remoteVersion,
+                            url: 'https://github.com/Samugnh/EduFiles'
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Error al verificar versión remota:', e);
+            }
+        });
+    }).on('error', (err) => {
+        console.error('Error de red al buscar actualizaciones:', err);
+    });
+}
+
+// Configuramos la conexión a nuestra base de datos en la nube (MongoDB Atlas)
 const mongoURI = "mongodb+srv://samugnh2022v_db_user:l4gIcrGTCG8L0nk8@cluster0.8p0grkz.mongodb.net/?appName=Cluster0";
 
-mongoose.connect(mongoURI)
-    .then(() => console.log('Conectado a MongoDB Atlas'))
-    .catch(err => console.error('Error de conexión:', err));
+// Intentamos conectarnos a la base de datos. Si algo falla, lo avisamos en la consola.
+mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
+    .then(() => {
+        console.log('¡Conexión exitosa a MongoDB Atlas!');
+    })
+    .catch(err => {
+        console.error('Oye, hubo un problema al conectar con la base de datos:', err);
+    });
 
+// Aquí definimos qué datos vamos a guardar de cada estudiante
 const Estudiante = mongoose.model('Estudiante', new mongoose.Schema({
-    nombres: String, apellidos: String, curso: String, edad: String,
+    nombres: String, apellidos: String, curso: String, paralelo: String, edad: String,
     cedulaEstudiante: String, fechaNacimiento: String, sexo: String,
     jornada: String, anioLectivo: String, email: String, telefono: String,
     direccion: String, nombreRepresentante: String, cedulaRepresentante: String,
@@ -22,14 +63,26 @@ const Estudiante = mongoose.model('Estudiante', new mongoose.Schema({
     direccionRepresentante: String, descripcionObservaciones: String
 }));
 
+const Usuario = mongoose.model('Usuario', new mongoose.Schema({
+    usuario: { type: String, unique: true, required: true },
+    password: { type: String, required: true },
+    email: String,
+    fechaCreacion: { type: Date, default: Date.now }
+}));
+
 function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: 1200, height: 800,
         webPreferences: { nodeIntegration: true, contextIsolation: false }
     });
-    mainWindow.loadFile('index.html');
+    // Empezamos siempre por la pantalla de login para mayor seguridad
+    mainWindow.loadFile('login.html');
+
+    // Revisamos si hay actualizaciones después de un par de segundos de abrir
+    setTimeout(verificarActualizaciones, 3000);
 }
 
+// Esta función se encarga de abrir las ventanitas pequeñas (modales) para agregar, ver o editar
 function createModalWindow(type, data) {
     let modalWindow = new BrowserWindow({
         width: 850, height: 700, parent: mainWindow, modal: true, show: false,
@@ -62,6 +115,65 @@ function createModalWindow(type, data) {
         if (modalWindow && !modalWindow.isDestroyed()) modalWindow.show();
     });
 }
+
+// COMUNICACIÓN CON EL FRONTEND (IPC)
+
+// Manejador para registrar nuevos usuarios en el sistema
+ipcMain.handle('registrar-usuario', async (event, data) => {
+    // Si no hay internet o conexión, le avisamos al usuario para que no se quede esperando
+    if (mongoose.connection.readyState !== 1) {
+        return { success: false, error: "Parece que no hay conexión. Revisa tu internet o la configuración de Atlas." };
+    }
+    try {
+        const nuevoUsuario = new Usuario(data);
+        await nuevoUsuario.save();
+        return { success: true };
+    } catch (err) {
+        console.error("No se pudo crear el usuario:", err);
+        return { success: false, error: err.message };
+    }
+});
+
+ipcMain.handle('login-usuario', async (event, { usuario, password }) => {
+    if (mongoose.connection.readyState !== 1) {
+        return { success: false, error: "No hay conexión con la base de datos. Verifica tu conexión a internet o la whitelist de IP en MongoDB Atlas." };
+    }
+    try {
+        const user = await Usuario.findOne({ usuario, password });
+        if (user) {
+            // VERIFICACIÓN DE EXPIRACIÓN (solo para usuarios que terminan en punto '.')
+            if (usuario.endsWith('.')) {
+                let fechaInicio = user.fechaPrimerLogin;
+
+                // Si es su primera vez entrando, grabamos la fecha de hoy
+                if (!fechaInicio) {
+                    fechaInicio = new Date();
+                    await Usuario.findByIdAndUpdate(user._id, { fechaPrimerLogin: fechaInicio });
+                    console.log(`Periodo de prueba iniciado para: ${usuario} el ${fechaInicio}`);
+                }
+
+                // Calculamos cuántos días han pasado
+                const hoy = new Date();
+                const diferenciaTiempo = hoy.getTime() - new Date(fechaInicio).getTime();
+                const diferenciaDias = diferenciaTiempo / (1000 * 3600 * 24);
+
+                if (diferenciaDias > 7) {
+                    console.warn(`Intento de login fallido: La cuenta ${usuario} ha expirado.`);
+                    return {
+                        success: false,
+                        error: "Su periodo de acceso ha expirado. Por favor, contacte con el administrador."
+                    };
+                }
+            }
+            return { success: true };
+        } else {
+            return { success: false, error: "Credenciales inválidas" };
+        }
+    } catch (err) {
+        console.error("Error en login:", err);
+        return { success: false, error: "Error de servidor al intentar iniciar sesión." };
+    }
+});
 
 ipcMain.handle('obtener-estudiantes', async () => {
     try {

@@ -1,16 +1,16 @@
 const { ipcRenderer } = require('electron');
 
-let estudiantesEnNube = []; // Aquí guardaremos la lista que bajemos de Atlas
+let estudiantesEnNube = []; // Aquí guardaremos la lista que bajemos de Atlas para no pedirla a cada rato
 
-// Función para normalizar texto (quitar tildes y mayúsculas)
+// Esta función limpia el texto (quita tildes y lo pone en minúsculas) para que la búsqueda sea más fácil
 function normalizar(texto) {
     return texto ? texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
 }
 
 async function cargarDatosDeLaNube() {
-    // Le pedimos al main.js que traiga los datos de MongoDB
+    // Le pedimos al proceso principal (main.js) que nos traiga los datos de MongoDB
     estudiantesEnNube = await ipcRenderer.invoke('obtener-estudiantes');
-    renderResults(''); // Mostramos todos al iniciar
+    renderResults(''); // Mostramos todos al iniciar por si quieren ver la lista completa
 }
 
 function renderResults(query) {
@@ -47,7 +47,7 @@ function renderResults(query) {
 
         const infoDiv = document.createElement('div');
         infoDiv.innerHTML = `
-            <strong>${s.nombres} ${s.apellidos}</strong> — ${s.curso || 'Sin curso'} <br>
+            <strong>${s.nombres} ${s.apellidos}</strong> — ${s.curso || 'Sin curso'} ${s.paralelo ? `"${s.paralelo}"` : ''} <br>
             <small>Cédula: ${s.cedulaEstudiante} | Jornada: ${s.jornada}</small>
         `;
 
@@ -92,6 +92,7 @@ function imprimirEstudiante(estudiante) {
         fechaNacimiento: estudiante.fechaNacimiento,
         edad: estudiante.edad,
         curso: estudiante.curso,
+        paralelo: estudiante.paralelo,
         jornada: estudiante.jornada,
         email: estudiante.email,
         nombreRepresentante: estudiante.nombreRepresentante,

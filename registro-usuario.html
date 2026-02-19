@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - EduFiles</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark));
+        }
+
+        .login-card {
+            background: var(--c-bg);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-card h2 {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--c-border);
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--c-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-login:hover {
+            background: var(--c-primary-dark);
+        }
+
+        .back-link {
+            margin-top: 20px;
+            display: block;
+            color: var(--c-text-muted);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <h2>Crear Cuenta</h2>
+        <div id="error-msg" style="color: #e74c3c; margin-bottom: 15px; font-weight: 600; display: none;"></div>
+        <form id="registroForm">
+            <div class="form-group">
+                <input type="text" id="usuario" placeholder="Usuario" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Correo Electrónico" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Contraseña" required>
+            </div>
+            <button type="submit" class="btn-login">Registrarse</button>
+        </form>
+        <a href="login.html" class="back-link">Volver al inicio de sesión</a>
+    </div>
+    <script src="registro-usuario.js"></script>
+</body>
+
+</html>

@@ -45,22 +45,22 @@
 
             <div class="form-group">
                 <label for="edad">Edad:</label>
-                <input type="number" id="edad" min="5" max="29" required>
+                <input type="number" id="edad" min="5" max="29">
             </div>
 
             <div class="form-group">
                 <label for="cedulaEstudiante">Cédula del Estudiante:</label>
-                <input type="text" id="cedulaEstudiante" required>
+                <input type="text" id="cedulaEstudiante">
             </div>
 
             <div class="form-group">
                 <label for="fechaNacimiento">Fecha de Nacimiento del Estudiante:</label>
-                <input type="date" id="fechaNacimiento" required>
+                <input type="date" id="fechaNacimiento">
             </div>
 
             <div class="form-group">
                 <label for="sexo">Sexo del Estudiante:</label>
-                <select id="sexo" required>
+                <select id="sexo">
                     <option value="">Seleccione una opción</option>
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
@@ -70,7 +70,7 @@
 
             <div class="form-group">
                 <label for="jornada">Jornada:</label>
-                <select id="jornada" required>
+                <select id="jornada">
                     <option value="">Seleccione una jornada</option>
                     <option value="Matutina">Matutina</option>
                     <option value="Vespertina">Vespertina</option>
@@ -80,12 +80,12 @@
 
             <div class="form-group">
                 <label for="anioLectivo">Año Lectivo:</label>
-                <input type="text" id="anioLectivo" placeholder="2025-2026" required>
+                <input type="text" id="anioLectivo" placeholder="2025-2026">
             </div>
 
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" required>
+                <input type="email" id="email">
             </div>
 
             <div class="form-group">
@@ -105,9 +105,34 @@
                 <label for="curso">Curso:</label>
                 <select id="curso" required>
                     <option value="">Seleccione un curso</option>
-                    <option value="1ro Bachillerato Tecnico">1ro Bachillerato Tecnico</option>
-                    <option value="2do Bachillerato Tecnico">2do Bachillerato Tecnico</option>
-                    <option value="3ro Bachillerato Tecnico">3ro Bachillerato Tecnico</option>
+                    <option value="Inicial 1">Inicial 1</option>
+                    <option value="Inicial 2">Inicial 2</option>
+                    <option value="1ro EGB">1ro EGB</option>
+                    <option value="2do EGB">2do EGB</option>
+                    <option value="3ro EGB">3ro EGB</option>
+                    <option value="4to EGB">4to EGB</option>
+                    <option value="5to EGB">5to EGB</option>
+                    <option value="6to EGB">6to EGB</option>
+                    <option value="7mo EGB">7mo EGB</option>
+                    <option value="8vo EGB">8vo EGB</option>
+                    <option value="9no EGB">9no EGB</option>
+                    <option value="10mo EGB">10mo EGB</option>
+                    <option value="1ro Técnico">1ro Técnico</option>
+                    <option value="2do Técnico">2do Técnico</option>
+                    <option value="3ro Técnico">3ro Técnico</option>
+                    <option value="1ro Ciencias">1ro Ciencias</option>
+                    <option value="2do Ciencias">2do Ciencias</option>
+                    <option value="3ro Ciencias">3ro Ciencias</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="grupoParalelo">
+                <label for="paralelo">Paralelo:</label>
+                <select id="paralelo">
+                    <option value="">N/A</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
                 </select>
             </div>
 
@@ -118,17 +143,17 @@
 
             <div class="form-group">
                 <label for="nombreRepresentante">Nombre del Representante:</label>
-                <input type="text" id="nombreRepresentante" required>
+                <input type="text" id="nombreRepresentante">
             </div>
 
             <div class="form-group">
                 <label for="cedulaRepresentante">Cédula del Representante:</label>
-                <input type="text" id="cedulaRepresentante" required>
+                <input type="text" id="cedulaRepresentante">
             </div>
 
             <div class="form-group">
                 <label for="telefonoRepresentante">Teléfono del Representante:</label>
-                <input type="text" id="telefonoRepresentante" required>
+                <input type="text" id="telefonoRepresentante">
             </div>
 
             <div class="form-group">
@@ -202,7 +227,7 @@
         }
 
         document.getElementById('formRegistro').addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Evitamos que la página se recargue
 
             const foto = await getFotoDataUrl();
 
@@ -219,6 +244,7 @@
                 email: document.getElementById('email').value,
                 telefono: document.getElementById('telefono').value,
                 curso: document.getElementById('curso').value,
+                paralelo: document.getElementById('paralelo').value,
                 direccion: document.getElementById('direccion').value,
                 nombreRepresentante: document.getElementById('nombreRepresentante').value,
                 cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
