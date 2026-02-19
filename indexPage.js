@@ -18,7 +18,8 @@ async function cargarCarpetasEstudiantes() {
         "1ro EGB", "2do EGB", "3ro EGB", "4to EGB", "5to EGB",
         "6to EGB", "7mo EGB", "8vo EGB", "9no EGB", "10mo EGB",
         "1ro Técnico", "2do Técnico", "3ro Técnico",
-        "1ro Ciencias", "2do Ciencias", "3ro Ciencias"
+        "1ro Ciencias", "2do Ciencias", "3ro Ciencias",
+        "Otros / Sin Asignar"
     ];
 
     contenedor.innerHTML = ''; // Limpiamos para que no se dupliquen al recargar
@@ -27,6 +28,9 @@ async function cargarCarpetasEstudiantes() {
         // Creamos visualmente cada carpeta
         const folder = document.createElement('div');
         folder.className = 'folder-card';
+        // Ajustamos diseño para "Otros" para que destaque un poco o sea consistente
+        const isOthers = curso.includes('Otros');
+
         folder.innerHTML = `
             <div class="folder-icon">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -36,11 +40,13 @@ async function cargarCarpetasEstudiantes() {
             <div class="folder-name">${curso}</div>
         `;
 
-        // Al hacer clic, decidimos si mostramos paralelos o la lista directa (para técnicos)
+        // Al hacer clic, decidimos si mostramos paralelos o la lista directa
         folder.addEventListener('click', async () => {
             console.log(`Abriendo: ${curso}`);
             const esTecnico = curso.toLowerCase().includes('técnico');
-            if (esTecnico) {
+            const esOtros = curso.includes('Otros');
+
+            if (esTecnico || esOtros) {
                 await mostrarEstudiantes(curso);
             } else {
                 await mostrarParalelos(curso);
@@ -50,6 +56,8 @@ async function cargarCarpetasEstudiantes() {
         contenedor.appendChild(folder);
     });
 }
+
+// ... (mostrarParalelos stays the same)
 
 async function mostrarParalelos(curso) {
     const modalCurso = getEl('modalCurso');
@@ -104,7 +112,22 @@ async function mostrarEstudiantes(curso, paralelo = null) {
         const todosEstudiantes = await ipcRenderer.invoke('obtener-estudiantes');
         console.log(`Total estudiantes obtenidos: ${todosEstudiantes.length}`);
 
+        const listaCursosEstandar = [
+            "Inicial 1", "Inicial 2", "1ro EGB", "2do EGB", "3ro EGB", "4to EGB", "5to EGB",
+            "6to EGB", "7mo EGB", "8vo EGB", "9no EGB", "10mo EGB",
+            "1ro Técnico", "2do Técnico", "3ro Técnico",
+            "1ro Ciencias", "2do Ciencias", "3ro Ciencias"
+        ].map(c => c.toLowerCase());
+
         const estudiantesFiltrados = todosEstudiantes.filter(est => {
+            const esOtros = curso.includes('Otros');
+
+            if (esOtros) {
+                // Si estamos en la carpeta Otros, buscamos los que no tienen curso o no están en la lista estándar
+                if (!est.curso || est.curso.trim() === '') return true;
+                return !listaCursosEstandar.includes(est.curso.trim().toLowerCase());
+            }
+
             if (!est.curso) return false;
             const coincideCurso = est.curso.trim().toLowerCase() === curso.trim().toLowerCase();
             if (paralelo) {
@@ -143,7 +166,7 @@ async function mostrarEstudiantes(curso, paralelo = null) {
                     `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
                         <rect width="128" height="128" rx="64" fill="#e5e7eb"/>
                         <circle cx="64" cy="50" r="22" fill="#9ca3af"/>
-                        <path d="M26 116c7-22 25-34 38-34h0c13 0 31 12 38 34" fill="#9ca3af"/>
+                        <path d="M26 116c7-18 15-28 38-28s31 10 38 28" fill="#9ca3af"/>
                     </svg>`
                 )}`;
                 const fotoSrc = estudiante.foto || DEFAULT_SVG;
