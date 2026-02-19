@@ -67,6 +67,7 @@ const Usuario = mongoose.model('Usuario', new mongoose.Schema({
     usuario: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     email: String,
+    fechaPrimerLogin: { type: Date }, // Para controlar el periodo de prueba de 7 días
     fechaCreacion: { type: Date, default: Date.now }
 }));
 
