@@ -1,5 +1,5 @@
-// Utilidades de almacenamiento y búsqueda de estudiantes.
-// El proyecto usa nodeIntegration=true, por eso en el renderer se puede usar require().
+// Toda la lógica de almacenamiento de estudiantes en localStorage.
+// Como usamos nodeIntegration=true, el renderer puede hacer require() sin problema.
 
 const STORAGE_KEY = 'estudiantes'
 
@@ -9,9 +9,8 @@ function safeString(value) {
 }
 
 function normalizeText(text) {
-  // Lowercase + trim + remove accents/diacritics
   const base = safeString(text).trim().toLowerCase()
-  // Unicode property escapes requieren un runtime moderno (Electron 38 lo soporta)
+  // Usamos normalize NFD para quitar los acentos
   return base.normalize('NFD').replace(/\p{Diacritic}/gu, '')
 }
 
@@ -20,7 +19,7 @@ function normalizeStudent(raw) {
 
   const s = { ...raw }
 
-  // Compatibilidad hacia atrás: versiones antiguas guardaban `nombre`.
+  // Compatibilidad con versiones viejas que guardaban 'nombre' en singular
   if (s.nombres === undefined && s.nombre !== undefined) {
     s.nombres = s.nombre
   }
@@ -95,7 +94,7 @@ function addStudent(student) {
   const students = loadStudents()
   const toAdd = {
     ...student,
-    id: student?.id ?? Date.now(),
+    id: student?.id ?? Date.now(), // timestamp como id único
   }
 
   students.push(toAdd)

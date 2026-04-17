@@ -201,7 +201,6 @@
             const file = input && input.files ? input.files[0] : null;
             if (!file) return '';
 
-            // Evitar reventar el localStorage con fotos enormes.
             const maxBytes = 300 * 1024;
             if (file.size > maxBytes) {
                 alert('La foto es muy grande. Usa una imagen más pequeña (<= 300KB).');
@@ -227,11 +226,10 @@
         }
 
         document.getElementById('formRegistro').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Evitamos que la página se recargue
+            e.preventDefault();
 
             const foto = await getFotoDataUrl();
 
-            // Recolectamos todos los campos del formulario
             const datos = {
                 nombres: document.getElementById('nombre').value,
                 apellidos: document.getElementById('apellidos').value,
@@ -250,7 +248,6 @@
                 cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
                 telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
                 foto: foto,
-                // Nuevos campos
                 codigoEstudiante: document.getElementById('codigoEstudiante').value,
                 nacionalidad: document.getElementById('nacionalidad').value,
                 etnia: document.getElementById('etnia').value,
@@ -259,8 +256,9 @@
                 descripcionObservaciones: document.getElementById('descripcionObservaciones').value
             };
 
-            // Enviamos al main.js para que mongoose lo guarde en Atlas
-            ipcRenderer.send('guardar-registro', datos);
+            // Guardamos el estudiante y le avisamos a la ventana principal
+            store.addStudent(datos);
+            ipcRenderer.send('cerrar-modal-y-notificar', 'registro-guardado');
         });
 
         document.getElementById('btnCancelar').addEventListener('click', () => {

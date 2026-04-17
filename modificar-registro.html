@@ -185,6 +185,7 @@
 
     <script>
         const { ipcRenderer } = require('electron');
+        const store = require('./studentStore');
 
         const DEFAULT_PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
             `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
@@ -245,19 +246,11 @@
 
         setFormEnabled(false);
 
-        async function buscarEstudiante() {
+        function buscarEstudiante() {
             const query = document.getElementById('buscarNombre').value.trim().toLowerCase();
             if (!query) return;
 
-            // Traer todos de MongoDB para filtrar (o implementar búsqueda en backend)
-            // Para simplicidad y consistencia con buscar.js, traemos todos.
-            try {
-                estudiantesCaché = await ipcRenderer.invoke('obtener-estudiantes');
-            } catch (err) {
-                console.error(err);
-                alert("Error obteniendo estudiantes de la base de datos");
-                return;
-            }
+            estudiantesCaché = store.loadStudents(); // Leemos directo del localStorage
 
             const normalize = (text) => text ? text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
             const filtro = normalize(query);
@@ -271,8 +264,7 @@
                 const encontrado = matches[0];
                 estudianteActual = encontrado;
 
-                // Usamos _id de mongo
-                document.getElementById('registroId').value = encontrado._id;
+                document.getElementById('registroId').value = encontrado.id;
 
                 document.getElementById('nombre').value = encontrado.nombres || '';
                 document.getElementById('apellidos').value = encontrado.apellidos || '';
@@ -290,8 +282,6 @@
                 document.getElementById('nombreRepresentante').value = encontrado.nombreRepresentante || '';
                 document.getElementById('cedulaRepresentante').value = encontrado.cedulaRepresentante || '';
                 document.getElementById('telefonoRepresentante').value = encontrado.telefonoRepresentante || '';
-
-                // Nuevos campos
                 document.getElementById('codigoEstudiante').value = encontrado.codigoEstudiante || '';
                 document.getElementById('nacionalidad').value = encontrado.nacionalidad || '';
                 document.getElementById('etnia').value = encontrado.etnia || '';
@@ -316,21 +306,20 @@
             document.getElementById('registroId').value = '';
             if (fotoPreview) fotoPreview.src = DEFAULT_PHOTO;
             setFormEnabled(false);
-            // Limpiar campos visualmente si quieres
             document.getElementById('formModificar').reset();
         }
 
         document.getElementById('formModificar').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const id = document.getElementById('registroId').value;
+            const id = Number(document.getElementById('registroId').value);
             if (!id) {
                 alert('Primero busca y selecciona un estudiante.');
                 return;
             }
 
             const datos = {
-                id: id, // ID de mongo
+                id: id,
                 nombres: document.getElementById('nombre').value,
                 apellidos: document.getElementById('apellidos').value,
                 edad: Number(document.getElementById('edad').value),
@@ -347,7 +336,6 @@
                 nombreRepresentante: document.getElementById('nombreRepresentante').value,
                 cedulaRepresentante: document.getElementById('cedulaRepresentante').value,
                 telefonoRepresentante: document.getElementById('telefonoRepresentante').value,
-                // Nuevos campos
                 codigoEstudiante: document.getElementById('codigoEstudiante').value,
                 nacionalidad: document.getElementById('nacionalidad').value,
                 etnia: document.getElementById('etnia').value,
@@ -358,11 +346,10 @@
             };
 
             const nuevaFoto = await getFotoDataUrl();
-            if (nuevaFoto) {
-                datos.foto = nuevaFoto;
-            }
+            if (nuevaFoto) datos.foto = nuevaFoto;
 
-            ipcRenderer.send('modificar-registro', datos);
+            store.updateStudent(datos); // Actualizamos el registro en localStorage
+            ipcRenderer.send('cerrar-modal-y-notificar', 'registro-modificado');
         });
 
         document.getElementById('btnCancelar').addEventListener('click', () => {

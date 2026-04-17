@@ -104,66 +104,63 @@
     </div>
     <script>
         const { ipcRenderer } = require('electron');
+        const store = require('./studentStore');
 
         function setText(id, value) {
             const el = document.getElementById(id);
             if (el) el.textContent = value || '---';
         }
 
-        async function render() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
+        let estudianteActual = null;
 
-            console.log("Renderizando detalle para ID:", id);
+        function render() {
+            const params = new URLSearchParams(window.location.search);
+            const idParam = params.get('id');
+            const id = Number(idParam);
 
             if (!id) return;
 
-            try {
-                // Buscamos solo al estudiante de este ID en Atlas
-                const s = await ipcRenderer.invoke('obtener-estudiante-por-id', id);
-                console.log("Estudiante obtenido:", s);
+            // Buscamos el estudiante por id numérico en el localStorage
+            const todos = store.loadStudents();
+            const s = todos.find(e => e.id === id);
 
-                if (s) {
-                    const fotoEl = document.getElementById('foto');
-                    if (fotoEl) fotoEl.src = s.foto || `data:image/svg+xml;utf8,${encodeURIComponent(
-                        `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-                            <rect width="128" height="128" rx="64" fill="#e5e7eb"/>
-                            <circle cx="64" cy="50" r="22" fill="#9ca3af"/>
-                            <path d="M26 116c7-18 15-28 38-28s31 10 38 28" fill="#9ca3af"/>
-                        </svg>`
-                    )}`;
+            if (s) {
+                estudianteActual = s;
+                const fotoEl = document.getElementById('foto');
+                if (fotoEl) fotoEl.src = s.foto || `data:image/svg+xml;utf8,${encodeURIComponent(
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+                        <rect width="128" height="128" rx="64" fill="#e5e7eb"/>
+                        <circle cx="64" cy="50" r="22" fill="#9ca3af"/>
+                        <path d="M26 116c7-18 15-28 38-28s31 10 38 28" fill="#9ca3af"/>
+                    </svg>`
+                )}`;
 
-                    const nombreEl = document.getElementById('nombre');
-                    if (nombreEl) nombreEl.textContent = `${s.nombres || ''} ${s.apellidos || ''}`;
+                const nombreEl = document.getElementById('nombre');
+                if (nombreEl) nombreEl.textContent = `${s.nombres || ''} ${s.apellidos || ''}`;
 
-                    const cursoEl = document.getElementById('curso');
-                    if (cursoEl) cursoEl.textContent = s.curso || '---';
+                const cursoEl = document.getElementById('curso');
+                if (cursoEl) cursoEl.textContent = s.curso || '---';
 
-                    setText('edad', s.edad);
-                    setText('cedulaEstudiante', s.cedulaEstudiante);
-                    setText('fechaNacimiento', s.fechaNacimiento);
-                    setText('sexo', s.sexo);
-                    setText('jornada', s.jornada);
-                    setText('anioLectivo', s.anioLectivo);
-                    setText('email', s.email);
-                    setText('telefono', s.telefono);
-                    setText('nacionalidad', s.nacionalidad);
-                    setText('etnia', s.etnia);
-                    setText('discapacidad', s.discapacidad);
-                    setText('direccion', s.direccion);
-                    setText('codigoEstudiante', s.codigoEstudiante);
-                    setText('nombreRepresentante', s.nombreRepresentante);
-                    setText('cedulaRepresentante', s.cedulaRepresentante);
-                    setText('telefonoRepresentante', s.telefonoRepresentante);
-                    setText('direccionRepresentante', s.direccionRepresentante);
-                    setText('descripcionObservaciones', s.descripcionObservaciones);
-                } else {
-                    document.getElementById('error').textContent = `Estudiante no encontrado en BD (ID: ${id})`;
-                    document.getElementById('error').classList.remove('hidden');
-                }
-            } catch (err) {
-                console.error("Error al cargar:", err);
-                document.getElementById('error').textContent = `Error buscando estudiante (ID: ${id})`;
+                setText('edad', s.edad);
+                setText('cedulaEstudiante', s.cedulaEstudiante);
+                setText('fechaNacimiento', s.fechaNacimiento);
+                setText('sexo', s.sexo);
+                setText('jornada', s.jornada);
+                setText('anioLectivo', s.anioLectivo);
+                setText('email', s.email);
+                setText('telefono', s.telefono);
+                setText('nacionalidad', s.nacionalidad);
+                setText('etnia', s.etnia);
+                setText('discapacidad', s.discapacidad);
+                setText('direccion', s.direccion);
+                setText('codigoEstudiante', s.codigoEstudiante);
+                setText('nombreRepresentante', s.nombreRepresentante);
+                setText('cedulaRepresentante', s.cedulaRepresentante);
+                setText('telefonoRepresentante', s.telefonoRepresentante);
+                setText('direccionRepresentante', s.direccionRepresentante);
+                setText('descripcionObservaciones', s.descripcionObservaciones);
+            } else {
+                document.getElementById('error').textContent = `Estudiante no encontrado (ID: ${id})`;
                 document.getElementById('error').classList.remove('hidden');
             }
         }
@@ -177,19 +174,9 @@
 
         const btnImprimir = document.getElementById('btnImprimir');
         if (btnImprimir) {
-            btnImprimir.addEventListener('click', async () => {
-                const params = new URLSearchParams(window.location.search);
-                const id = params.get('id');
-                if (!id) return;
-
-                try {
-                    // Re-fetcheamos para tener los datos más frescos, o podríamos guardar en variable global en render()
-                    const s = await ipcRenderer.invoke('obtener-estudiante-por-id', id);
-                    if (s) {
-                        ipcRenderer.send('abrir-impresion', s);
-                    }
-                } catch (err) {
-                    console.error("Error al preparar impresión:", err);
+            btnImprimir.addEventListener('click', () => {
+                if (estudianteActual) {
+                    ipcRenderer.send('abrir-impresion', estudianteActual);
                 }
             });
         }

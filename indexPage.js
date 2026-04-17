@@ -1,14 +1,14 @@
 const { ipcRenderer } = require('electron');
+const store = require('./studentStore');
 
-// Función auxiliar para obtener elementos del DOM con verificación
+// Pequeño helper para no repetir getElementById en todos lados
 function getEl(id) {
     const el = document.getElementById(id);
-    if (!el) console.warn(`Elemento con id "${id}" no encontrado.`);
+    if (!el) console.warn(`No encontré el elemento con id "${id}".`);
     return el;
 }
 
-async function cargarCarpetasEstudiantes() {
-    console.log("Estamos preparando las carpetas de los cursos...");
+function cargarCarpetasEstudiantes() {
     const contenedor = getEl('contenedorCarpetas');
     if (!contenedor) return;
 
@@ -22,7 +22,7 @@ async function cargarCarpetasEstudiantes() {
         "Otros / Sin Asignar"
     ];
 
-    contenedor.innerHTML = ''; // Limpiamos para que no se dupliquen al recargar
+    contenedor.innerHTML = ''; // Limpiamos antes de redibujar
 
     cursos.forEach(curso => {
         // Creamos visualmente cada carpeta
@@ -40,7 +40,8 @@ async function cargarCarpetasEstudiantes() {
             <div class="folder-name">${curso}</div>
         `;
 
-        // Al hacer clic, decidimos si mostramos paralelos o la lista directa
+        // Si es Técnico u Otros, vamos directo a la lista de estudiantes
+        // Si no, primero mostramos los paralelos
         folder.addEventListener('click', async () => {
             console.log(`Abriendo: ${curso}`);
             const esTecnico = curso.toLowerCase().includes('técnico');
@@ -97,7 +98,7 @@ async function mostrarParalelos(curso) {
     });
 }
 
-async function mostrarEstudiantes(curso, paralelo = null) {
+function mostrarEstudiantes(curso, paralelo = null) {
     const modalCurso = getEl('modalCurso');
     const tituloModal = getEl('tituloModalCurso');
     const contenidoModal = getEl('contenidoModalCurso');
@@ -105,11 +106,11 @@ async function mostrarEstudiantes(curso, paralelo = null) {
     if (!modalCurso || !contenidoModal) return;
 
     tituloModal.innerText = paralelo ? `Estudiantes - ${curso} "${paralelo}"` : `Estudiantes de ${curso}`;
-    contenidoModal.innerHTML = '<p>Cargando estudiantes...</p>';
+    contenidoModal.innerHTML = '<p>Cargando...</p>';
     modalCurso.classList.add('visible');
 
     try {
-        const todosEstudiantes = await ipcRenderer.invoke('obtener-estudiantes');
+        const todosEstudiantes = store.loadStudents();
         console.log(`Total estudiantes obtenidos: ${todosEstudiantes.length}`);
 
         const listaCursosEstandar = [
@@ -119,6 +120,7 @@ async function mostrarEstudiantes(curso, paralelo = null) {
             "1ro Ciencias", "2do Ciencias", "3ro Ciencias"
         ].map(c => c.toLowerCase());
 
+        // Los que no tienen curso asignado o tienen uno no estándar van a "Otros"
         const estudiantesFiltrados = todosEstudiantes.filter(est => {
             const esOtros = curso.includes('Otros');
 
@@ -140,7 +142,7 @@ async function mostrarEstudiantes(curso, paralelo = null) {
         contenidoModal.innerHTML = '';
 
         if (estudiantesFiltrados.length === 0) {
-            contenidoModal.innerHTML = '<p>No hay estudiantes registrados en este curso/paralelo.</p>';
+            contenidoModal.innerHTML = '<p>No hay estudiantes en este curso/paralelo todavía.</p>';
             if (paralelo) {
                 const btnVolver = document.createElement('div');
                 btnVolver.innerHTML = `<span>← Volver a Paralelos</span>`;
@@ -179,7 +181,7 @@ async function mostrarEstudiantes(curso, paralelo = null) {
 
                 card.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    ipcRenderer.send('abrir-modal', 'detalle', { id: estudiante._id });
+                    ipcRenderer.send('abrir-modal', 'detalle', { id: estudiante.id });
                 });
 
                 contenidoModal.appendChild(card);
@@ -187,7 +189,7 @@ async function mostrarEstudiantes(curso, paralelo = null) {
         }
     } catch (error) {
         console.error("Error al cargar estudiantes:", error);
-        contenidoModal.innerHTML = '<p>Error crítico al cargar los datos de la base de datos.</p>';
+        contenidoModal.innerHTML = '<p>Error crítico al cargar los datos.</p>';
     }
 }
 
@@ -233,7 +235,7 @@ ipcRenderer.on('nueva-version', (event, info) => {
     }
 });
 
-// Escuchas para actualizar la vista
+// Actualizamos la vista cuando se guarda, modifica o elimina algo
 ipcRenderer.on('registro-guardado', () => cargarCarpetasEstudiantes());
 ipcRenderer.on('registro-eliminado', () => cargarCarpetasEstudiantes());
 ipcRenderer.on('registro-modificado', () => cargarCarpetasEstudiantes());

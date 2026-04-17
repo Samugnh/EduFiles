@@ -38,6 +38,7 @@
 
     <script>
         const { ipcRenderer } = require('electron');
+        const store = require('./studentStore');
 
         let estudianteSeleccionado = null;
         let estudiantesCaché = [];
@@ -46,13 +47,7 @@
             const query = document.getElementById('buscarNombre').value.trim().toLowerCase();
             if (!query) return;
 
-            try {
-                estudiantesCaché = await ipcRenderer.invoke('obtener-estudiantes');
-            } catch (err) {
-                console.error(err);
-                alert("Error obteniendo estudiantes de la base de datos");
-                return;
-            }
+            estudiantesCaché = store.loadStudents(); // Leemos lo que hay en local
 
             const normalize = (text) => text ? text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
             const filtro = normalize(query);
@@ -91,12 +86,8 @@
 
             const fullName = `${estudianteSeleccionado.nombres || ''} ${estudianteSeleccionado.apellidos || ''}`.trim();
             if (confirm(`¿Estás seguro de eliminar a ${fullName}?`)) {
-                // Enviamos el _id de mongo
-                ipcRenderer.send('eliminar-registro', estudianteSeleccionado._id);
-                // No llamamos a cerrar() aquí si queremos mostrar alerta de éxito primero, 
-                // pero el handler en main cierra la ventana.
-                // Si preferimos cerrar ya:
-                // cerrar();
+                store.deleteStudent(estudianteSeleccionado.id); // Borramos del localStorage
+                ipcRenderer.send('cerrar-modal-y-notificar', 'registro-eliminado');
             }
         }
 
