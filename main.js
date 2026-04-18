@@ -8,7 +8,7 @@ let mainWindow;
 // Compara la versión local con la del repo en GitHub
 // Si hay una más nueva, le avisamos al usuario con un banner
 function verificarActualizaciones() {
-    const url = 'https://raw.githubusercontent.com/Samugnh/EduFiles/main/package.json';
+    const url = 'https://raw.githubusercontent.com/Samugnh/EduSearch/main/package.json';
 
     https.get(url, (res) => {
         let body = '';
@@ -22,7 +22,7 @@ function verificarActualizaciones() {
                         mainWindow.webContents.send('nueva-version', {
                             local: pkg.version,
                             remota: remotePkg.version,
-                            url: 'https://github.com/Samugnh/EduFiles'
+                            url: 'https://github.com/Samugnh/EduSearch'
                         });
                     }
                 }

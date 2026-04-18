@@ -1,5 +1,5 @@
 {
-  "name": "edufiles",
+  "name": "EduSearch",
   "version": "2.0.0",
   "description": "Gestor de archivos institucionales",
   "main": "main.js",
@@ -8,8 +8,8 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.edufiles.v2",
-    "productName": "EduFiles",
+    "appId": "com.EduSearch.v2",
+    "productName": "EduSearch",
     "win": {
       "target": [
         "nsis"
@@ -21,7 +21,7 @@
       "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "EduFiles"
+      "shortcutName": "EduSearch"
     }
   },
   "devDependencies": {
